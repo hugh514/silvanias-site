@@ -26,7 +26,7 @@ lib/
   supabase/
     client.ts       → cliente frontend (publishable key)
     server.ts       → cliente backend (secret key)
-    middleware.ts    → lógica de sessão usada no middleware
+    proxy.ts    → lógica de sessão usada no middleware
 middleware.ts        → protege rotas /admin (redireciona não logados
                         para /admin/login e logados para longe do login)
 
