@@ -1,0 +1,62 @@
+Estou desenvolvendo o site "Silvania's Cacau", uma vitrine virtual para uma
+empresa artesanal de chocolate, com painel administrativo.
+
+STACK
+- Next.js 14+ (App Router) + React + TypeScript
+- Tailwind CSS
+- Supabase (PostgreSQL, Auth, Storage) — usando o novo sistema de chaves
+  (publishable key / secret key, não mais anon/service_role)
+- Vercel (hospedagem)
+
+ESTRUTURA DE PASTAS
+app/
+  page.tsx                     → vitrine (página principal)
+  admin/
+    login/page.tsx
+    produtos/page.tsx
+    produtos/novo/page.tsx
+    produtos/[id]/page.tsx
+  produtos/
+    [id]/page.tsx               → página pública do produto
+components/
+  ui/        → componentes reutilizáveis
+  vitrine/   → componentes da vitrine
+  admin/     → componentes do painel
+lib/
+  supabase/
+    client.ts       → cliente frontend (publishable key)
+    server.ts       → cliente backend (secret key)
+    middleware.ts    → lógica de sessão usada no middleware
+middleware.ts        → protege rotas /admin (redireciona não logados
+                        para /admin/login e logados para longe do login)
+
+BANCO DE DADOS (tabela `produtos`)
+id uuid, nome text, categoria text, descricao text, ingredientes text,
+preco numeric(10,2), unidade text ('peso'|'volume'|'unidade'),
+valor_unidade text, disponivel boolean, fotos text[], created_at timestamptz
+
+SEGURANÇA (RLS)
+- Leitura pública (qualquer visitante lê produtos, sem login)
+- Escrita só para usuários autenticados
+- Não existe cadastro público de usuários — único usuário é o admin,
+  criado manualmente no painel do Supabase (signup público desabilitado)
+
+DESIGN SYSTEM (Figma)
+Cores (100% opacidade):
+- Preto: #000000
+- Branco: #FFFFFF
+- Branco falso: #F0F0E6
+- Amarelo: #E6BB68
+- Cor de pele: #B58365
+- Marrom: #603116
+- Marrom escuro: #351503
+- Marrom claro: #C88576
+- Rosa: #F7A5B6
+Fonte: Gadugi
+Ícones: biblioteca Iconify
+
+ESTADO ATUAL
+Ambiente já configurado: projeto Next.js criado, Supabase conectado,
+.env.local configurado, middleware protegendo /admin, estrutura de
+pastas e páginas placeholder criadas. Banco e RLS já aplicados no
+Supabase.
