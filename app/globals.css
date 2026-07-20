@@ -18,3 +18,15 @@ body {
   background: var(--color-branco-falso);
   color: var(--color-preto);
 }
+button:not(:disabled),
+a,
+[role="button"],
+select,
+summary,
+label[for] {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}

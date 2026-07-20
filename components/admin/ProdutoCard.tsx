@@ -17,7 +17,7 @@ export default function ProdutoCard({ produto }: { produto: Produto }) {
   return (
     <Link
       href={`/admin/produtos/${produto.id}`}
-      className="bg-branco rounded-xl shadow-sm overflow-hidden flex flex-col
+      className="bg-branco rounded-md shadow-sm overflow-hidden flex flex-col
                  transition-transform duration-200 md:hover:-translate-y-1"
     >
       <div className="relative w-full aspect-square bg-branco-falso">
@@ -46,7 +46,7 @@ export default function ProdutoCard({ produto }: { produto: Produto }) {
         </p>
 
         <span
-          className={`self-start mt-2 text-xs font-medium px-3 py-1 rounded-full ${
+          className={`self-end mt-2 text-xs font-medium px-3 py-1 rounded-sm ${
             produto.disponivel
               ? 'bg-green-100 text-green-700'
               : 'bg-red-100 text-red-700'

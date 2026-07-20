@@ -56,7 +56,7 @@ export default function ProdutosGrid({ produtos }: { produtos: Produto[] }) {
 {/* Barra de busca, filtro e cadastro */}
 <div
   className="flex flex-col lg:flex-row gap-4 lg:items-end"
-  style={{ ['--campo-altura' as string]: 'clamp(3.25rem, 5vw, 3.75rem)' }}
+  style={{ ['--campo-altura' as string]: 'clamp(2.5rem, 3vw, 3rem)' }}
 >
   {/* Busca */}
   <div className="flex flex-col flex-1">
@@ -73,7 +73,7 @@ export default function ProdutosGrid({ produtos }: { produtos: Produto[] }) {
         placeholder="Pesquisar"
         value={busca}
         onChange={(e) => atualizarBusca(e.target.value)}
-        className="flex-1 bg-transparent outline-none text-preto placeholder:text-cor-pele min-w-0"
+        className="flex-1 bg-transparent outline-none text-preto placeholder:text-cor-pele min-w-0 text-xs lg:text-sm"
       />
     </label>
   </div>
@@ -96,7 +96,7 @@ export default function ProdutosGrid({ produtos }: { produtos: Produto[] }) {
           onChange={(e) =>
             atualizarFiltro(e.target.value as 'todos' | 'sim' | 'nao')
           }
-          className="appearance-none bg-branco rounded-xl shadow-sm w-full h-full px-4 pr-10 text-preto outline-none cursor-pointer"
+          className="appearance-none bg-branco rounded-xl shadow-sm w-full h-full px-4 pr-10 text-preto outline-none cursor-pointer text-xs lg:text-sm"
         >
           <option value="todos">Todos</option>
           <option value="sim">Disponível</option>
@@ -114,10 +114,10 @@ export default function ProdutosGrid({ produtos }: { produtos: Produto[] }) {
     <div className="flex flex-col justify-end">
       <Link
         href="/admin/produtos/novo"
-        className="flex items-center justify-center gap-2 bg-marrom-escuro hover:bg-marrom text-branco font-medium rounded-xl px-7 whitespace-nowrap transition-colors shrink-0"
+        className="flex items-center justify-center gap-2 bg-marrom-escuro hover:bg-marrom text-branco font-medium rounded-xl px-7 whitespace-nowrap transition-colors shrink-0 text-xs lg:text-sm"
         style={{ height: 'var(--campo-altura)' }}
       >
-        <Icon icon="mdi:plus" className="text-lg" />
+        <Icon icon="mdi:plus" className="text-md lg:text-lg " />
         Cadastrar
       </Link>
     </div>
@@ -134,7 +134,7 @@ export default function ProdutosGrid({ produtos }: { produtos: Produto[] }) {
         <p className="text-center text-cor-pele py-10">Nenhum produto encontrado.</p>
       )}
 
-      {/* Paginação */}
+      {/* Paginação e contador */}
       {produtosFiltrados.length > 0 && (
         <div className="flex items-center justify-center gap-4 mt-4">
           <button
@@ -161,11 +161,7 @@ export default function ProdutosGrid({ produtos }: { produtos: Produto[] }) {
         </div>
       )}
 
-    {/* Contador */}
-        <p className="text-center text-sm text-preto bg-branco shadow-sm rounded-lg px-4 py-1.5 mx-auto w-fit">
-            {produtosDaPagina.length} de {produtosFiltrados.length}
-            {produtosFiltrados.length !== produtos.length && ` ${produtos.length} `}
-        </p>
+   
     </div>
   )
 }
