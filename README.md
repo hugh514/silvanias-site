@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Silvania's Cacau
 
-## Getting Started
+Vitrine virtual para a Silvania's Cacau, uma agroindústria artesanal de
+chocolate localizada na Amazônia. O projeto substitui a divulgação feita
+por Instagram, apresentando os produtos da empresa de forma organizada e
+profissional para outras empresas interessadas.
 
-First, run the development server:
+## Sobre o projeto
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+O site funciona como um catálogo digital, onde é possível conhecer a
+empresa, navegar pelos produtos disponíveis e entrar em contato
+diretamente pelo WhatsApp para combinar valores e condições. Além da
+vitrine pública, o projeto conta com um painel administrativo simples,
+que permite à própria empresa cadastrar, editar e gerenciar seus produtos
+sem depender de suporte técnico.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Funcionalidades
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Vitrine pública com apresentação da empresa, catálogo de produtos e
+  página de detalhes de cada produto
+- Seção "Quem somos", contando a história e os valores da empresa
+- Seção de localização com mapa interativo
+- Contato direto via WhatsApp, Instagram e Facebook
+- Painel administrativo com login protegido
+- Cadastro, edição e exclusão de produtos, incluindo upload de fotos
+- Controle de disponibilidade dos produtos
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tecnologias utilizadas
 
-## Learn More
+- **Next.js** (App Router) + **React** + **TypeScript**
+- **Tailwind CSS** para estilização
+- **Supabase** (banco de dados, autenticação e armazenamento de imagens)
+- **Vercel** para hospedagem
 
-To learn more about Next.js, take a look at the following resources:
+## Objetivo
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Oferecer uma presença digital simples, rápida e fácil de manter para a
+Silvania's Cacau, valorizando a apresentação dos produtos e facilitando o
+primeiro contato com potenciais parceiros comerciais.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Link do site
+*https://silvanias-site.vercel.app/*
