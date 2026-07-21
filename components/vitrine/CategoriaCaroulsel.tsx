@@ -75,7 +75,7 @@ export default function CategoriaCarousel({ categoria, produtos }: Props) {
         onPointerLeave={onPointerUp}
         className="flex gap-5 overflow-x-auto cursor-grab active:cursor-grabbing select-none
                   py-4 -my-4
-                  [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                  scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       >
         {/* Imagem fixa de destaque, primeiro item da lista, rola junto com os cards */}
         {IMAGEM_CATEGORIA[categoria] && (

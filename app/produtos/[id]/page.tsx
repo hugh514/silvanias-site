@@ -1,27 +1,28 @@
-import { createClient } from '@/supabase/server'
-import { notFound } from 'next/navigation'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Icon } from '@iconify/react'
-import GaleriaProduto from '@/components/vitrine/GaleriaProduto'
+import { createClient } from "@/supabase/server";
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { Icon } from "@iconify/react";
+import GaleriaProduto from "@/components/vitrine/GaleriaProduto";
+import { NUMEROZAP } from "@/lib/constants";
 
 export default async function ProdutoPage({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = await params
-  const supabase = await createClient()
+  const { id } = await params;
+  const supabase = await createClient();
 
   const { data: produto, error } = await supabase
-    .from('produtos')
-    .select('id, nome, ingredientes, descricao, fotos')
-    .eq('id', id)
-    .eq('disponivel', true)
-    .single()
+    .from("produtos")
+    .select("id, nome, ingredientes, descricao, fotos")
+    .eq("id", id)
+    .eq("disponivel", true)
+    .single();
 
   if (error || !produto) {
-    notFound()
+    notFound();
   }
 
   return (
@@ -79,18 +80,21 @@ export default async function ProdutoPage({
               )}
             </div>
 
-            <button
+            <a
+              href={NUMEROZAP}
+              target="_blank"
+              rel="noopener noreferrer"
               type="button"
               className="self-end md:self-end flex items-center justify-center gap-2
                          bg-marrom-escuro hover:bg-marrom text-branco font-medium
-                         px-10 py-3.5 rounded-2xl transition-colors mt-4 w-full md:w-fit"
+                         px-8 py-3.5 rounded-xl transition-colors mt-4 w-full md:w-fit"
             >
               <Icon icon="mdi:whatsapp" className="text-xl" />
               Pedir
-            </button>
+            </a>
           </div>
         </div>
       </div>
     </main>
-  )
+  );
 }
