@@ -31,11 +31,10 @@ export default function Hero() {
               Coloque o arquivo em: public/images/hero-produto.png
             */}
             <Image
-              src="/images/hero-produto.png"
+              src="/images/hero-v3.png"
               alt="Chocolate Silvania's Cacau"
               fill
-              className="object-contain p-6"
-              priority
+              className="overflow-hidden p-6"              
             />
           </div>
 
@@ -57,10 +56,10 @@ export default function Hero() {
         <div className="hidden md:block relative flex-1 max-w-lg aspect-square bg-branco rounded-2xl shadow-sm">
           {/* Mesma imagem do bloco mobile acima */}
           <Image
-            src="/images/hero-produto.png"
+            src="/images/hero-v3.png"
             alt="Chocolate Silvania's Cacau"
             fill
-            className="object-contain p-10"
+            className="overflow-hidden p-10"
           />
         </div>
       </div>

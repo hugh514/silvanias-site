@@ -38,7 +38,7 @@ export default function QuemSomos() {
             className="relative w-full h-full min-h-65 md:min-h-105 rounded-2xl overflow-hidden"
           >
             <Image
-              src="/images/imagem-quem-somos-2.png"
+              src="/images/imagem-quem-somos-2-v2.png"
               alt="Pé de cacau na Amazônia"
               fill
               className="object-cover"
@@ -65,7 +65,7 @@ export default function QuemSomos() {
             className="relative w-full aspect-video rounded-2xl overflow-hidden"
           >
             <Image
-              src="/images/imagem-quem-somos-1.png"
+              src="/images/imagem-quem-somos-1-v2.png"
               alt="Chocolate, manteiga de cacau e amêndoas de cacau"
               fill
               className="object-cover"

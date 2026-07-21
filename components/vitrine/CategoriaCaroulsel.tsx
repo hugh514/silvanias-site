@@ -18,8 +18,8 @@ type Props = {
 
 // Mapeia categoria -> imagem de destaque fixa no início da lista
 const IMAGEM_CATEGORIA: Record<string, string> = {
-  Chocolate: "/images/categoria-chocolate.png",
-  "Derivados do Cacau": "/images/categoria-derivados.png",
+  Chocolate: "/images/categoria-chocolate-v3.png",
+  "Derivados do Cacau": "/images/categoria-derivados-v2.png",
 };
 
 export default function CategoriaCarousel({ categoria, produtos }: Props) {
