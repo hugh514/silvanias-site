@@ -11,6 +11,12 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Silvania's Cacau",
   description: 'Chocolate artesanal',
+
+  icons: {
+    icon: '/images/icon.svg',   
+    shortcut: '/images/logo-aba.svg',
+    apple: '/images/logo-aba.svg',
+  }
 }
 
 export default function RootLayout({

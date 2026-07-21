@@ -70,7 +70,7 @@ export default function UploadFotos({ fotos, onChange }: Props) {
           <input
             ref={inputRef}
             type="file"
-            accept="image/png,image/jpeg"
+            accept="image/*"
             multiple
             className="hidden"
             onChange={(e) => handleArquivos(e.target.files)}

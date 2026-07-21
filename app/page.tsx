@@ -1,7 +1,13 @@
+import Hero from '@/components/vitrine/Hero'
+import Marquee from '@/components/vitrine/Maquee'
+
 export default function VitrinePage() {
   return (
     <main>
-      <h1>Silvania&apos;s Cacau</h1>
+      <Hero />
+      <Marquee />
+
+      <section id="catalogo" className="min-h-screen bg-branco-falso" />
     </main>
   )
 }
