@@ -66,17 +66,23 @@ export default function CategoriaCarousel({ categoria, produtos }: Props) {
     <div className="flex flex-col gap-4">
       <h3 className="text-lg font-medium text-marrom-escuro">{categoria}</h3>
 
-      <div
-        ref={scrollRef}
-        onScroll={atualizarProgresso}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerLeave={onPointerUp}
-        className="flex gap-5 overflow-x-auto cursor-grab active:cursor-grabbing select-none
-                  py-4 -my-4
-                  scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-      >
+    <div
+  ref={scrollRef}
+  onScroll={atualizarProgresso}
+  onPointerDown={onPointerDown}
+  onPointerMove={onPointerMove}
+  onPointerUp={onPointerUp}
+  onPointerLeave={onPointerUp}
+  onClickCapture={(e) => {
+    if (moveu.current) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+  }}
+  className="flex gap-5 overflow-x-auto cursor-grab active:cursor-grabbing select-none
+            py-4 -my-4
+            scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+>
         {/* Imagem fixa de destaque, primeiro item da lista, rola junto com os cards */}
         {IMAGEM_CATEGORIA[categoria] && (
           <div className="relative shrink-0 w-55 sm:w-70 md:w-85 aspect-4/3 rounded-2xl overflow-hidden">

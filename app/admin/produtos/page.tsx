@@ -1,4 +1,4 @@
-import { createClient } from '../../../supabase/server'
+import { createClient } from '../../../lib/supabase/server'
 import ProdutosGrid from '@/components/admin/ProdutosGrid'
 
 export default async function AdminProdutosPage() {
@@ -6,7 +6,7 @@ export default async function AdminProdutosPage() {
 
   const { data: produtos, error } = await supabase
     .from('produtos')
-    .select('id, nome, categoria, preco_unidade, unidade, disponivel, fotos')
+    .select('id, nome, categoria, disponivel, fotos')
     .order('created_at', { ascending: false })
 
   if (error) {

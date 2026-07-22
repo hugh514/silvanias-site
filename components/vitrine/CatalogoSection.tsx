@@ -1,4 +1,4 @@
-import { createClient } from '@/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { CATEGORIAS } from '@/lib/constants'
 import CategoriaCarousel from './CategoriaCaroulsel'
 

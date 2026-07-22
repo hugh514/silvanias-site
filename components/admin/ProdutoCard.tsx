@@ -4,9 +4,7 @@ import Link from 'next/link'
 type Produto = {
   id: string
   nome: string
-  categoria: string
-  preco_unidade: number | null
-  unidade: string | null
+  categoria: string 
   disponivel: boolean
   fotos: string[] | null
 }
@@ -38,12 +36,7 @@ export default function ProdutoCard({ produto }: { produto: Produto }) {
 
       <div className="p-4 flex flex-col gap-1">
         <span className="text-xs text-cor-pele">{produto.categoria}</span>
-        <h3 className="font-medium text-preto truncate">{produto.nome}</h3>
-        <p className="text-sm text-marrom-escuro">
-          {produto.preco_unidade
-            ? `R$ ${produto.preco_unidade.toFixed(2).replace('.', ',')}`
-            : 'R$ 0,00'}
-        </p>
+        <h3 className="font-medium text-preto truncate">{produto.nome}</h3>      
 
         <span
           className={`self-end mt-2 text-xs font-medium px-3 py-1 rounded-sm ${

@@ -1,4 +1,4 @@
-import { createClient } from '@/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import ProdutoForm from '@/components/admin/ProdutoForm'
 import { notFound } from 'next/navigation'
 

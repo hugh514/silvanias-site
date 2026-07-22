@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Icon } from '@iconify/react'
-import { createClient } from '../../supabase/client'
+import { createClient } from '../../lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 export default function LoginForm() {

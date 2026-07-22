@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
-import { createClient } from "../../supabase/client";
-import { CATEGORIAS, UNIDADES, type Unidade } from "@/lib/constants";
+import { createClient } from "../../lib/supabase/client";
+import { CATEGORIAS } from "@/lib/constants";
 import UploadFotos, { type FotoItem } from "./UploadFotos";
 
 type Produto = {
@@ -13,20 +13,12 @@ type Produto = {
   categoria: string;
   descricao: string | null;
   ingredientes: string | null;
-  preco_unidade: number | null;
-  unidade: Unidade;
   disponivel: boolean;
   fotos: string[] | null;
 };
 
 type Props = {
   produtoExistente?: Produto;
-};
-
-const LABEL_UNIDADE: Record<Unidade, string> = {
-  peso: "Preço peso",
-  volume: "Preço volume",
-  unidade: "Preço unidade",
 };
 
 export default function ProdutoForm({ produtoExistente }: Props) {
@@ -41,15 +33,6 @@ export default function ProdutoForm({ produtoExistente }: Props) {
     produtoExistente?.ingredientes ?? "",
   );
   const [descricao, setDescricao] = useState(produtoExistente?.descricao ?? "");
-  const [precoDigitos, setPrecoDigitos] = useState(
-    produtoExistente?.preco_unidade
-      ? Math.round(produtoExistente.preco_unidade * 100).toString()
-      : "",
-  );
-  const [unidade, setUnidade] = useState<Unidade>(
-    produtoExistente?.unidade ?? "peso",
-  );
-  const [quantidade, setQuantidade] = useState(""); // texto livre, ex: "60g", "500ml"
   const [disponivel, setDisponivel] = useState(
     produtoExistente?.disponivel ?? true,
   );
@@ -68,25 +51,12 @@ export default function ProdutoForm({ produtoExistente }: Props) {
     })) ?? [],
   );
 
-  function formatarCentavosParaReal(digitos: string): string {
-    if (!digitos) return "";
-    const numero = Number(digitos) / 100;
-    return numero.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    });
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErro("");
 
     if (!nome.trim()) {
       setErro("Informe o nome do produto.");
-      return;
-    }
-    if (!precoDigitos || Number(precoDigitos) <= 0) {
-      setErro("Informe um preço válido.");
       return;
     }
 
@@ -126,8 +96,6 @@ export default function ProdutoForm({ produtoExistente }: Props) {
         categoria,
         descricao: descricao.trim() || null,
         ingredientes: ingredientes.trim() || null,
-        preco_unidade: Number(precoDigitos) / 100,
-        unidade,
         disponivel,
         fotos: urlsFinais,
       };
@@ -243,58 +211,7 @@ export default function ProdutoForm({ produtoExistente }: Props) {
             />
           </div>
 
-          {/* Preço, Unidade e Quantidade na mesma linha */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-marrom-escuro">
-                {LABEL_UNIDADE[unidade]}
-              </label>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={formatarCentavosParaReal(precoDigitos)}
-                onChange={(e) =>
-                  setPrecoDigitos(e.target.value.replace(/\D/g, ""))
-                }
-                className="bg-branco rounded-xl shadow-sm px-4 py-3 text-preto outline-none"
-                placeholder="R$ 0,00"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-marrom-escuro">Unidade</label>
-              <div className="relative">
-                <select
-                  value={unidade}
-                  onChange={(e) => setUnidade(e.target.value as Unidade)}
-                  className="appearance-none w-full bg-branco rounded-xl shadow-sm px-4 py-3 pr-9 text-preto outline-none cursor-pointer"
-                >
-                  {UNIDADES.map((u) => (
-                    <option key={u.value} value={u.value}>
-                      {u.label}
-                    </option>
-                  ))}
-                </select>
-                <Icon
-                  icon="mdi:menu-down"
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-2xl text-preto pointer-events-none"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-marrom-escuro">Quantidade</label>
-              <input
-                type="text"
-                value={quantidade}
-                onChange={(e) => setQuantidade(e.target.value)}
-                className="bg-branco rounded-xl shadow-sm px-4 py-3 text-preto outline-none"
-                placeholder="Ex: 60g"
-              />
-            </div>
-          </div>
-
-          {/* Disponível, abaixo da linha de preço/unidade/quantidade */}
+          {/* Disponível */}
           <div className="flex flex-col gap-1.5">
             <label className="text-xs text-marrom-escuro">Disponível</label>
             <div className="relative">
@@ -322,7 +239,6 @@ export default function ProdutoForm({ produtoExistente }: Props) {
 
       {erro && <p className="text-sm text-red-600">{erro}</p>}
       {/* botões */}
-
 
       <div className="flex justify-end gap-4">
         {editando && (

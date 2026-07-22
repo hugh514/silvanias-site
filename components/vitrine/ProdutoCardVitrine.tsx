@@ -1,6 +1,6 @@
+import Link from 'next/link'
 import Image from 'next/image'
 import { Icon } from '@iconify/react'
-import Link from 'next/link'
 
 type Produto = {
   id: string
@@ -14,13 +14,15 @@ export default function ProdutoCardVitrine({ produto }: { produto: Produto }) {
   const fotoHover = produto.fotos?.[1] ?? fotoPrincipal
 
   return (
-   <div
-  className="group shrink-0 w-47.5 sm:w-55 md:w-65 bg-branco rounded-2xl
-             shadow-[0_4px_16px_rgba(53,21,3,0.2)]
-             p-3 flex flex-col gap-3 transition-all duration-200
-             md:hover:-translate-y-1.5 md:shadow-[0_4px_16px_rgba(53,21,3,0.25)]
-             select-none"
->
+    <Link
+      href={`/produtos/${produto.id}`}
+      draggable={false}
+      className="group shrink-0 w-47.5 sm:w-55 md:w-65 bg-branco rounded-2xl
+                 shadow-[0_8px_24px_-8px_rgba(53,21,3,0.25)]
+                 p-3 flex flex-col gap-3 transition-all duration-200
+                 md:hover:-translate-y-1.5 md:hover:shadow-[0_12px_28px_-8px_rgba(53,21,3,0.32)]
+                 select-none"
+    >
       <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-branco-falso">
         {fotoPrincipal ? (
           <>
@@ -56,15 +58,10 @@ export default function ProdutoCardVitrine({ produto }: { produto: Produto }) {
       </div>
 
       <div className="flex items-center justify-end">
-        <Link
-          type="button"
-          className="w-9 h-9 rounded-full bg-marrom-claro/30 hover:bg-marrom-claro/50 flex items-center justify-center transition-colors"
-          aria-label="Ver produto"
-          href={`/produtos/${produto.id}`}
-        >
+        <span className="w-9 h-9 rounded-full bg-marrom-claro/30 flex items-center justify-center">
           <Icon icon="mdi:plus" className="text-marrom-escuro text-lg" />
-        </Link>
+        </span>
       </div>
-    </div>
+    </Link>
   )
 }

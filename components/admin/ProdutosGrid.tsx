@@ -9,8 +9,6 @@ type Produto = {
   id: string
   nome: string
   categoria: string
-  preco_unidade: number | null
-  unidade: string | null
   disponivel: boolean
   fotos: string[] | null
 }

@@ -1,10 +1,10 @@
-import { createClient } from "@/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import GaleriaProduto from "@/components/vitrine/GaleriaProduto";
-import { NUMEROZAP } from "@/lib/constants";
+import { gerarLinkWhatsapp } from "@/lib/constants";
 
 export default async function ProdutoPage({
   params,
@@ -31,7 +31,7 @@ export default async function ProdutoPage({
         {/* Cabeçalho: voltar + logo */}
         <div className="flex items-center justify-between mb-10">
           <Link
-            href="/"
+            href="/#catalogo"
             className="w-12 h-12 rounded-full bg-marrom-escuro hover:bg-marrom flex items-center justify-center shrink-0"
             aria-label="Voltar"
           >
@@ -39,8 +39,7 @@ export default async function ProdutoPage({
           </Link>
 
           {/*
-            INSERIR LOGO AQUI
-            Mesmo arquivo já usado em outras telas: public/images/logo.png
+        logo
           */}
           <Image
             src="/images/logo.png"
@@ -81,13 +80,14 @@ export default async function ProdutoPage({
             </div>
 
             <a
-              href={NUMEROZAP}
+              href={gerarLinkWhatsapp(
+                `Olá! Vi o produto "${produto.nome}" no site de vocês e fiquei interessado(a). Pode me passar mais informações?`,
+              )}
               target="_blank"
               rel="noopener noreferrer"
-              type="button"
-              className="self-end md:self-end flex items-center justify-center gap-2
-                         bg-marrom-escuro hover:bg-marrom text-branco font-medium
-                         px-8 py-3.5 rounded-xl transition-colors mt-4 w-full md:w-fit"
+              className="self-start md:self-auto flex items-center justify-center gap-2
+             bg-marrom-escuro hover:bg-marrom text-branco font-medium
+             px-10 py-3.5 rounded-2xl transition-colors mt-4 w-full md:w-fit"
             >
               <Icon icon="mdi:whatsapp" className="text-xl" />
               Pedir
