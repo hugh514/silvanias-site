@@ -2,12 +2,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Icon } from '@iconify/react'
 
-type Produto = {
-  id: string
-  nome: string
-  categoria: string
-  fotos: string[] | null
-}
+import type { Produto as ProdutoCompleto } from '@/types/produto'
+
+type Produto = Pick<ProdutoCompleto, 'id' | 'nome' | 'categoria' | 'fotos'>
 
 export default function ProdutoCardVitrine({ produto }: { produto: Produto }) {
   const fotoPrincipal = produto.fotos?.[0]

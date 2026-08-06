@@ -1,42 +1,39 @@
 'use client'
 
-import { useState } from 'react'
-import { Icon } from '@iconify/react'
-import { createClient } from '../../lib/supabase/client'
+import { useActionState, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Icon } from '@iconify/react'
 
+import { entrar, type ResultadoEntrada } from '@/lib/actions/auth'
+
+/**
+ * Formulário de entrada.
+ *
+ * Antes de 2026-07-25 chamava `signInWithPassword` diretamente do navegador, sem
+ * qualquer limitação de tentativas — nada travava um automatismo a experimentar
+ * palavras-passe.
+ *
+ * Agora a autenticação passa por uma ação de servidor, que conta as tentativas
+ * falhadas por origem antes de sequer tentar autenticar.
+ *
+ * A aparência mantém-se igual.
+ */
 export default function LoginForm() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [senha, setSenha] = useState('')
   const [mostrarSenha, setMostrarSenha] = useState(false)
-  const [erro, setErro] = useState('')
-  const [carregando, setCarregando] = useState(false)
+  const [estado, acao, pendente] = useActionState<ResultadoEntrada | null, FormData>(
+    entrar,
+    null
+  )
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setErro('')
-    setCarregando(true)
+  useEffect(() => {
+    if (estado?.ok) router.replace('/admin/produtos')
+  }, [estado, router])
 
-    const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password: senha,
-    })
-
-    setCarregando(false)
-
-    if (error) {
-      setErro('Email ou senha inválidos.')
-      return
-    }
-
-    router.push('/admin/produtos')
-    router.refresh()
-  }
+  const erro = estado && !estado.ok ? estado.erro : ''
 
   return (
-    <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
+    <form action={acao} className="w-full flex flex-col items-center">
       <h1 className="hidden md:block text-3xl font-bold text-preto mb-8">
         LOGIN
       </h1>
@@ -49,9 +46,9 @@ export default function LoginForm() {
           <Icon icon="mdi:email-outline" className="text-marrom-claro text-xl shrink-0" />
           <input
             type="email"
+            name="email"
             placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
             required
             className="bg-transparent outline-none w-full text-preto placeholder:text-cor-pele"
           />
@@ -61,9 +58,9 @@ export default function LoginForm() {
           <Icon icon="mdi:lock-outline" className="text-marrom-claro text-xl shrink-0" />
           <input
             type={mostrarSenha ? 'text' : 'password'}
+            name="senha"
             placeholder="Senha"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
+            autoComplete="current-password"
             required
             className="bg-transparent outline-none w-full text-preto placeholder:text-cor-pele"
           />
@@ -79,15 +76,17 @@ export default function LoginForm() {
       </div>
 
       {erro && (
-        <p className="text-sm text-red-600 mt-3 self-start">{erro}</p>
+        <p className="text-sm text-red-600 mt-3 self-start" role="alert">
+          {erro}
+        </p>
       )}
 
       <button
         type="submit"
-        disabled={carregando}
+        disabled={pendente}
         className="mt-8 bg-marrom-escuro hover:bg-marrom text-branco font-medium px-10 py-2.5 rounded-lg transition-colors disabled:opacity-60"
       >
-        {carregando ? 'Entrando...' : 'Entrar'}
+        {pendente ? 'Entrando...' : estado?.ok ? 'A abrir…' : 'Entrar'}
       </button>
     </form>
   )

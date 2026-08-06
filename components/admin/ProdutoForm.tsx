@@ -1,26 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@iconify/react";
-import { createClient } from "../../lib/supabase/client";
-import { CATEGORIAS } from "@/lib/constants";
-import UploadFotos, { type FotoItem } from "./UploadFotos";
 
-type Produto = {
-  id: string;
-  nome: string;
-  categoria: string;
-  descricao: string | null;
-  ingredientes: string | null;
-  disponivel: boolean;
-  fotos: string[] | null;
-};
+import { CATEGORIAS } from "@/lib/constants";
+import {
+  atualizarProduto,
+  criarProduto,
+  removerProduto,
+  type ResultadoAcao,
+} from "@/lib/actions/produtos";
+import type { CamposComErro } from "@/lib/schemas/produto";
+import type { Produto } from "@/types/produto";
+import UploadFotos, { type FotoItem } from "./UploadFotos";
 
 type Props = {
   produtoExistente?: Produto;
 };
 
+/**
+ * Formulário de produto.
+ *
+ * Antes de 2026-07-25 este componente falava diretamente com o Supabase a partir
+ * do navegador: enviava ficheiros, inseria, alterava e removia linhas, tudo com a
+ * chave anónima que está no pacote JavaScript do site. A única coisa a impedir um
+ * estranho de fazer o mesmo eram as políticas de acesso — que, na altura,
+ * permitiam a qualquer conta autenticada.
+ *
+ * Agora nada sai daqui diretamente para a base de dados. Tudo passa por ações de
+ * servidor que verificam sessão e autorização antes de escrever.
+ *
+ * A aparência mantém-se exatamente igual: o redesenho é fase seguinte.
+ *
+ * Nota sobre `useTransition` em vez de `useActionState`: as fotos vivem em estado
+ * do componente (o utilizador acrescenta e remove antes de submeter), e não num
+ * `<input type="file">` que o formulário pudesse serializar sozinho. Construir o
+ * FormData à mão é mais direto do que sincronizar o input com o estado. O estado
+ * de submissão vem do `useTransition` e as ações mantêm a assinatura compatível
+ * com `useActionState`, caso venha a fazer sentido.
+ */
 export default function ProdutoForm({ produtoExistente }: Props) {
   const router = useRouter();
   const editando = !!produtoExistente;
@@ -36,12 +55,14 @@ export default function ProdutoForm({ produtoExistente }: Props) {
   const [disponivel, setDisponivel] = useState(
     produtoExistente?.disponivel ?? true,
   );
+
   const [erro, setErro] = useState("");
-  const [carregando, setCarregando] = useState(false);
+  const [camposComErro, setCamposComErro] = useState<CamposComErro>({});
+  const [carregando, iniciarSubmissao] = useTransition();
 
   // excluir produto estados
   const [modalExcluirAberto, setModalExcluirAberto] = useState(false);
-  const [excluindo, setExcluindo] = useState(false);
+  const [excluindo, iniciarExclusao] = useTransition();
 
   const [fotos, setFotos] = useState<FotoItem[]>(
     produtoExistente?.fotos?.map((url) => ({
@@ -51,103 +72,53 @@ export default function ProdutoForm({ produtoExistente }: Props) {
     })) ?? [],
   );
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setErro("");
-
-    if (!nome.trim()) {
-      setErro("Informe o nome do produto.");
+  function tratarResultado(resultado: ResultadoAcao) {
+    if (resultado.ok) {
+      router.push("/admin/produtos");
       return;
     }
-
-    setCarregando(true);
-    const supabase = createClient();
-
-    try {
-      // 1. Upload das fotos novas (as que têm `arquivo`)
-      const urlsFinais: string[] = [];
-
-      for (const foto of fotos) {
-        if (foto.urlExistente) {
-          urlsFinais.push(foto.urlExistente);
-          continue;
-        }
-        if (!foto.arquivo) continue;
-
-        const caminho = `${crypto.randomUUID()}-${foto.arquivo.name}`;
-        const { error: erroUpload } = await supabase.storage
-          .from("produtos")
-          .upload(caminho, foto.arquivo);
-
-        if (erroUpload)
-          throw new Error(
-            "Erro ao enviar uma das fotos: " + erroUpload.message,
-          );
-
-        const { data } = supabase.storage
-          .from("produtos")
-          .getPublicUrl(caminho);
-        urlsFinais.push(data.publicUrl);
-      }
-
-      // 2. Montar objeto do produto
-      const objetoProduto = {
-        nome: nome.trim(),
-        categoria,
-        descricao: descricao.trim() || null,
-        ingredientes: ingredientes.trim() || null,
-        disponivel,
-        fotos: urlsFinais,
-      };
-
-      // 3. Insert ou update
-      const { error: erroSalvar } = editando
-        ? await supabase
-            .from("produtos")
-            .update(objetoProduto)
-            .eq("id", produtoExistente.id)
-        : await supabase.from("produtos").insert(objetoProduto);
-
-      if (erroSalvar) throw new Error(erroSalvar.message);
-
-      router.push("/admin/produtos");
-      router.refresh();
-    } catch (err) {
-      setErro(err instanceof Error ? err.message : "Erro ao salvar produto.");
-    } finally {
-      setCarregando(false);
-    }
+    setErro(resultado.erro);
+    setCamposComErro(resultado.camposComErro ?? {});
   }
-  async function handleExcluir() {
-    if (!produtoExistente) return;
 
-    setExcluindo(true);
-    const supabase = createClient();
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setErro("");
+    setCamposComErro({});
 
-    try {
-      // Remove os arquivos do Storage também, pra não deixar lixo órfão
-      const caminhosStorage = (produtoExistente.fotos ?? [])
-        .map((url) => url.split("/produtos/").pop())
-        .filter((caminho): caminho is string => !!caminho);
+    const dados = new FormData();
+    dados.set("nome", nome);
+    dados.set("categoria", categoria);
+    dados.set("ingredientes", ingredientes);
+    dados.set("descricao", descricao);
+    dados.set("disponivel", disponivel ? "sim" : "nao");
 
-      if (caminhosStorage.length > 0) {
-        await supabase.storage.from("produtos").remove(caminhosStorage);
-      }
-
-      const { error: erroExcluir } = await supabase
-        .from("produtos")
-        .delete()
-        .eq("id", produtoExistente.id);
-
-      if (erroExcluir) throw new Error(erroExcluir.message);
-
-      router.push("/admin/produtos");
-      router.refresh();
-    } catch (err) {
-      setErro(err instanceof Error ? err.message : "Erro ao excluir produto.");
-      setExcluindo(false);
-      setModalExcluirAberto(false);
+    for (const foto of fotos) {
+      if (foto.urlExistente) dados.append("fotosExistentes", foto.urlExistente);
+      else if (foto.arquivo) dados.append("fotosNovas", foto.arquivo);
     }
+
+    iniciarSubmissao(async () => {
+      const resultado = editando
+        ? await atualizarProduto(produtoExistente.id, null, dados)
+        : await criarProduto(null, dados);
+      tratarResultado(resultado);
+    });
+  }
+
+  function handleExcluir() {
+    if (!produtoExistente) return;
+    setErro("");
+
+    iniciarExclusao(async () => {
+      const resultado = await removerProduto(produtoExistente.id);
+      if (resultado.ok) {
+        router.push("/admin/produtos");
+        return;
+      }
+      setErro(resultado.erro);
+      setModalExcluirAberto(false);
+    });
   }
 
   return (
@@ -156,22 +127,30 @@ export default function ProdutoForm({ produtoExistente }: Props) {
         {/* Coluna esquerda */}
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-marrom-escuro">
+            <label htmlFor="nome" className="text-xs text-marrom-escuro">
               Nome do produto
             </label>
             <input
+              id="nome"
               type="text"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
+              aria-invalid={!!camposComErro.nome}
               className="bg-branco rounded-xl shadow-sm px-4 py-3 text-preto outline-none"
               placeholder="Ex: Chocolate 80% com leite"
             />
+            {camposComErro.nome && (
+              <span className="text-xs text-red-600">{camposComErro.nome}</span>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-marrom-escuro">Categoria</label>
+            <label htmlFor="categoria" className="text-xs text-marrom-escuro">
+              Categoria
+            </label>
             <div className="relative">
               <select
+                id="categoria"
                 value={categoria}
                 onChange={(e) => setCategoria(e.target.value)}
                 className="appearance-none w-full bg-branco rounded-xl shadow-sm px-4 py-3 pr-10 text-preto outline-none cursor-pointer"
@@ -187,35 +166,53 @@ export default function ProdutoForm({ produtoExistente }: Props) {
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-2xl text-preto pointer-events-none"
               />
             </div>
+            {camposComErro.categoria && (
+              <span className="text-xs text-red-600">{camposComErro.categoria}</span>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-marrom-escuro">Ingredientes</label>
+            <label htmlFor="ingredientes" className="text-xs text-marrom-escuro">
+              Ingredientes
+            </label>
             <textarea
+              id="ingredientes"
               value={ingredientes}
               onChange={(e) => setIngredientes(e.target.value)}
               rows={2}
               className="bg-branco rounded-xl shadow-sm px-4 py-3 text-preto outline-none resize-none"
               placeholder="Ex: Cacau em pó, leite, açúcar"
             />
+            {camposComErro.ingredientes && (
+              <span className="text-xs text-red-600">{camposComErro.ingredientes}</span>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-marrom-escuro">Descrição</label>
+            <label htmlFor="descricao" className="text-xs text-marrom-escuro">
+              Descrição
+            </label>
             <textarea
+              id="descricao"
               value={descricao}
               onChange={(e) => setDescricao(e.target.value)}
               rows={4}
               className="bg-branco rounded-xl shadow-sm px-4 py-3 text-preto outline-none resize-none"
               placeholder="Descreva o produto..."
             />
+            {camposComErro.descricao && (
+              <span className="text-xs text-red-600">{camposComErro.descricao}</span>
+            )}
           </div>
 
           {/* Disponível */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-marrom-escuro">Disponível</label>
+            <label htmlFor="disponivel" className="text-xs text-marrom-escuro">
+              Disponível
+            </label>
             <div className="relative">
               <select
+                id="disponivel"
                 value={disponivel ? "sim" : "nao"}
                 onChange={(e) => setDisponivel(e.target.value === "sim")}
                 className="appearance-none w-full bg-branco rounded-xl shadow-sm px-4 py-3 pr-10 text-preto outline-none cursor-pointer"
@@ -237,7 +234,11 @@ export default function ProdutoForm({ produtoExistente }: Props) {
         </div>
       </div>
 
-      {erro && <p className="text-sm text-red-600">{erro}</p>}
+      {erro && (
+        <p className="text-sm text-red-600" role="alert">
+          {erro}
+        </p>
+      )}
       {/* botões */}
 
       <div className="flex justify-end gap-4">
@@ -245,7 +246,8 @@ export default function ProdutoForm({ produtoExistente }: Props) {
           <button
             type="button"
             onClick={() => setModalExcluirAberto(true)}
-            className="px-6 py-3 rounded-xl bg-branco shadow-sm text-red-600 font-medium text-xs lg:text-sm"
+            disabled={carregando || excluindo}
+            className="px-6 py-3 rounded-xl bg-branco shadow-sm text-red-600 font-medium text-xs lg:text-sm disabled:opacity-60"
           >
             Excluir
           </button>
@@ -254,14 +256,15 @@ export default function ProdutoForm({ produtoExistente }: Props) {
         <button
           type="button"
           onClick={() => router.push("/admin/produtos")}
-          className="px-6 py-3 rounded-xl bg-branco shadow-sm text-marrom-escuro font-medium text-xs lg:text-sm"
+          disabled={carregando || excluindo}
+          className="px-6 py-3 rounded-xl bg-branco shadow-sm text-marrom-escuro font-medium text-xs lg:text-sm disabled:opacity-60"
         >
           Cancelar
         </button>
 
         <button
           type="submit"
-          disabled={carregando}
+          disabled={carregando || excluindo}
           className="px-6 py-3 rounded-xl bg-marrom-escuro hover:bg-marrom text-branco text-xs lg:text-sm font-medium transition-colors disabled:opacity-60"
         >
           {carregando ? "Salvando..." : "Salvar"}

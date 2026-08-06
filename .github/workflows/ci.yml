@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verificar:
+    name: Análise, construção e testes
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Análise estática
+        run: npm run lint
+
+      - name: Testes unitários
+        run: npm test
+
+      - name: Construção
+        run: npm run build
+        env:
+          # Valores de marcador: a construção não contacta o Supabase, mas as
+          # variáveis têm de existir. NUNCA colocar aqui as de produção.
+          NEXT_PUBLIC_SUPABASE_URL: https://exemplo.supabase.co
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: chave-de-marcador
+          SUPABASE_SECRET_KEY: segredo-de-marcador
+
+      - name: Fronteira de segredos
+        # Rede de segurança para além do `server-only`: se alguma vez alguém
+        # remover esse import, isto ainda apanha o problema.
+        run: |
+          echo "Procurando ficheiros de navegador que importem lib/supabase/admin..."
+          suspeitos=$(grep -rl '"use client"\|'"'"'use client'"'"'' \
+            --include='*.tsx' --include='*.ts' app components lib 2>/dev/null || true)
+          falhou=0
+          for f in $suspeitos; do
+            if grep -q "supabase/admin" "$f"; then
+              echo "::error file=$f::ficheiro de navegador importa lib/supabase/admin.ts"
+              falhou=1
+            fi
+          done
+          if [ "$falhou" -eq 1 ]; then
+            echo "A credencial de serviço não pode chegar ao navegador (FR-026, FR-028)."
+            exit 1
+          fi
+          echo "OK — nenhum ficheiro de navegador depende da credencial de serviço."
+
+  # Os testes de integração e de percurso completo precisam de um Supabase real e
+  # de segredos próprios. Ficam num trabalho separado para que a sua ausência não
+  # bloqueie a verificação básica de cada alteração.
+  #
+  # NUNCA apontar para o projeto de produção: tests/setup/guarda-ambiente.ts
+  # aborta se detetar esse identificador.
+  integracao:
+    name: Testes de integração
+    runs-on: ubuntu-latest
+    if: ${{ vars.SUPABASE_TESTE_URL != '' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Testes de acesso negado
+        run: npm run test:integration
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.SUPABASE_TESTE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_TESTE_PUBLISHABLE_KEY }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_TESTE_SECRET_KEY }}

@@ -4,8 +4,8 @@ import { useRef, useState } from 'react'
 import { Icon } from '@iconify/react'
 import Image from 'next/image'
 
-const MAX_FOTOS = 4
-const MAX_TAMANHO_MB = 5
+import { MAX_FOTOS } from '@/lib/schemas/produto'
+import { TAMANHO_MAXIMO_BYTES, TIPOS_PERMITIDOS } from '@/lib/upload/validar-imagem'
 
 export type FotoItem = {
   id: string
@@ -19,21 +19,43 @@ type Props = {
   onChange: (fotos: FotoItem[]) => void
 }
 
+const MAX_TAMANHO_MB = TAMANHO_MAXIMO_BYTES / 1024 / 1024
+
 export default function UploadFotos({ fotos, onChange }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [fotoAmpliada, setFotoAmpliada] = useState<FotoItem | null>(null)
+
+  // Substitui o alert() nativo, que bloqueava a página e era o único feedback de
+  // erro deste componente. Princípio V da constituição.
+  const [avisos, setAvisos] = useState<string[]>([])
 
   function handleArquivos(arquivos: FileList | null) {
     if (!arquivos) return
 
     const novasFotos: FotoItem[] = []
+    const novosAvisos: string[] = []
     const espacoDisponivel = MAX_FOTOS - fotos.length
+    const selecionados = Array.from(arquivos)
 
-    for (const arquivo of Array.from(arquivos).slice(0, espacoDisponivel)) {
-      if (arquivo.size > MAX_TAMANHO_MB * 1024 * 1024) {
-        alert(`"${arquivo.name}" excede ${MAX_TAMANHO_MB}MB e foi ignorado.`)
+    if (selecionados.length > espacoDisponivel) {
+      novosAvisos.push(
+        `São permitidas no máximo ${MAX_FOTOS} fotos. As demais foram ignoradas.`
+      )
+    }
+
+    for (const arquivo of selecionados.slice(0, espacoDisponivel)) {
+      if (arquivo.size > TAMANHO_MAXIMO_BYTES) {
+        novosAvisos.push(`"${arquivo.name}" excede ${MAX_TAMANHO_MB} MB e foi ignorado.`)
         continue
       }
+
+      // Verificação por conveniência: o servidor revalida pelos bytes reais do
+      // ficheiro, porque o tipo declarado aqui é escolhido por quem envia.
+      if (!TIPOS_PERMITIDOS.includes(arquivo.type as (typeof TIPOS_PERMITIDOS)[number])) {
+        novosAvisos.push(`"${arquivo.name}" não é JPG, PNG, WebP ou AVIF e foi ignorado.`)
+        continue
+      }
+
       novasFotos.push({
         id: crypto.randomUUID(),
         preview: URL.createObjectURL(arquivo),
@@ -41,10 +63,19 @@ export default function UploadFotos({ fotos, onChange }: Props) {
       })
     }
 
-    onChange([...fotos, ...novasFotos])
+    setAvisos(novosAvisos)
+    if (novasFotos.length > 0) onChange([...fotos, ...novasFotos])
+
+    // Permite reselecionar o mesmo ficheiro depois de o remover.
+    if (inputRef.current) inputRef.current.value = ''
   }
 
   function removerFoto(id: string) {
+    const alvo = fotos.find((f) => f.id === id)
+    // Liberta a memória do preview local; sem isto o objeto fica retido.
+    if (alvo?.arquivo) URL.revokeObjectURL(alvo.preview)
+
+    setAvisos([])
     onChange(fotos.filter((f) => f.id !== id))
   }
 
@@ -65,12 +96,12 @@ export default function UploadFotos({ fotos, onChange }: Props) {
             Arraste ou clique para selecionar
           </span>
           <span className="text-xs text-cor-pele">
-            PNG, JPG até {MAX_TAMANHO_MB}MB cada
+            JPG, PNG, WebP ou AVIF até {MAX_TAMANHO_MB} MB cada
           </span>
           <input
             ref={inputRef}
             type="file"
-            accept="image/*"
+            accept={TIPOS_PERMITIDOS.join(',')}
             multiple
             className="hidden"
             onChange={(e) => handleArquivos(e.target.files)}
@@ -78,17 +109,37 @@ export default function UploadFotos({ fotos, onChange }: Props) {
         </label>
       )}
 
+      {avisos.length > 0 && (
+        <ul className="flex flex-col gap-1" role="status" aria-live="polite">
+          {avisos.map((aviso) => (
+            <li key={aviso} className="text-xs text-red-600">
+              {aviso}
+            </li>
+          ))}
+        </ul>
+      )}
+
       {fotos.length > 0 && (
         <div className="grid grid-cols-3 gap-3">
           {fotos.map((foto) => (
-            <div key={foto.id} className="relative aspect-square rounded-xl overflow-hidden shadow-sm">
+            <div
+              key={foto.id}
+              className="relative aspect-square rounded-xl overflow-hidden shadow-sm"
+            >
               <button
                 type="button"
                 onClick={() => setFotoAmpliada(foto)}
                 className="w-full h-full cursor-zoom-in"
                 aria-label="Ampliar foto"
               >
-                <Image src={foto.preview} alt="Foto do produto" fill className="object-cover" />
+                <Image
+                  src={foto.preview}
+                  alt="Foto do produto"
+                  fill
+                  sizes="(max-width: 768px) 33vw, 200px"
+                  className="object-cover"
+                  unoptimized={!foto.urlExistente}
+                />
               </button>
               <button
                 type="button"
@@ -129,7 +180,9 @@ export default function UploadFotos({ fotos, onChange }: Props) {
               src={fotoAmpliada.preview}
               alt="Foto do produto ampliada"
               fill
+              sizes="100vw"
               className="object-contain"
+              unoptimized={!fotoAmpliada.urlExistente}
             />
           </div>
         </div>

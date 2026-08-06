@@ -1,13 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-type Produto = {
-  id: string
-  nome: string
-  categoria: string 
-  disponivel: boolean
-  fotos: string[] | null
-}
+import type { Produto as ProdutoCompleto } from '@/types/produto'
+
+type Produto = Pick<ProdutoCompleto, 'id' | 'nome' | 'categoria' | 'disponivel' | 'fotos'>
 
 export default function ProdutoCard({ produto }: { produto: Produto }) {
   const foto = produto.fotos?.[0]

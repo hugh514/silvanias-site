@@ -4,14 +4,14 @@ import { useMemo, useState } from 'react'
 import { Icon } from '@iconify/react'
 import Link from 'next/link'
 import ProdutoCard from './ProdutoCard'
+import BotaoSair from './BotaoSair'
 
-type Produto = {
-  id: string
-  nome: string
-  categoria: string
-  disponivel: boolean
-  fotos: string[] | null
-}
+import type { Produto as ProdutoCompleto } from '@/types/produto'
+
+// Derivado da fonte de verdade em vez de redigitado. Princípio IV: antes desta
+// alteração o tipo estava redefinido à mão em cinco componentes, cada um livre
+// de divergir do esquema real.
+type Produto = Pick<ProdutoCompleto, 'id' | 'nome' | 'categoria' | 'disponivel' | 'fotos'>
 
 const ITENS_POR_PAGINA = 15
 
@@ -118,6 +118,11 @@ export default function ProdutosGrid({ produtos }: { produtos: Produto[] }) {
         <Icon icon="mdi:plus" className="text-md lg:text-lg " />
         Cadastrar
       </Link>
+    </div>
+
+    {/* Sair do painel (FR-030) */}
+    <div className="flex flex-col justify-end">
+      <BotaoSair />
     </div>
   </div>
 </div>
