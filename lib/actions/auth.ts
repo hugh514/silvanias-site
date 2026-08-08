@@ -2,7 +2,6 @@
 
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { revalidatePath } from 'next/cache'
 
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
@@ -66,18 +65,10 @@ export async function entrar(
 
   await admin.rpc('limpar_tentativas', { p_origem: origem })
 
-  // Confirmar administrador antes de devolver sucesso.
-  // Não usar `redirect()` aqui: com `useActionState`, o Next reenvia um POST
-  // para `/admin/produtos` e o proxy corre sem os cookies da sessão nova,
-  // mandando de volta ao login (parece "acesso negado").
-  const { data: ehAdmin, error: erroAdmin } = await supabase.rpc('is_admin')
-  if (erroAdmin || ehAdmin !== true) {
-    await supabase.auth.signOut()
-    return { ok: false, erro: ERRO_CREDENCIAIS }
-  }
-
-  revalidatePath('/admin', 'layout')
-  return { ok: true }
+  // Uma conta válida que não conste da lista de administradores autentica com
+  // sucesso e é reencaminhada pelo middleware. A distinção não é exposta aqui,
+  // pelo mesmo motivo de FR-021.
+  redirect('/admin/produtos')
 }
 
 /**

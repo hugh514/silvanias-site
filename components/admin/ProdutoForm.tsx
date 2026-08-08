@@ -75,6 +75,7 @@ export default function ProdutoForm({ produtoExistente }: Props) {
   function tratarResultado(resultado: ResultadoAcao) {
     if (resultado.ok) {
       router.push("/admin/produtos");
+      router.refresh();
       return;
     }
     setErro(resultado.erro);
@@ -114,6 +115,7 @@ export default function ProdutoForm({ produtoExistente }: Props) {
       const resultado = await removerProduto(produtoExistente.id);
       if (resultado.ok) {
         router.push("/admin/produtos");
+        router.refresh();
         return;
       }
       setErro(resultado.erro);

@@ -27,14 +27,6 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          // Evitar Set-Cookie em pedidos em que nada mudou: o App Router do
-          // Next interpreta Set-Cookie como motivo para revalidar o documento e
-          // volta a pedir a página → loop de GET /admin/produtos.
-          const mudou = cookiesToSet.some(
-            ({ name, value }) => request.cookies.get(name)?.value !== value
-          )
-          if (!mudou) return
-
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
@@ -45,11 +37,9 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // `getClaims()` valida o JWT localmente — sem ir ao Auth nem renovar a
-  // sessão. `getUser()` em cada pedido renovava cookies e disparava o loop de
-  // recarregamento do painel.
-  const { data: claimsData } = await supabase.auth.getClaims()
-  const userId = claimsData?.claims?.sub
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   const caminho = request.nextUrl.pathname
   const rotaLogin = caminho === '/admin/login'
@@ -58,17 +48,13 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone()
     url.pathname = destino
     url.search = ''
-    const resposta = NextResponse.redirect(url)
-    supabaseResponse.cookies.getAll().forEach((cookie) => {
-      resposta.cookies.set(cookie.name, cookie.value)
-    })
-    return resposta
+    return NextResponse.redirect(url)
   }
 
   // Sem sessão a tentar entrar no painel → página de entrada.
-  if (!rotaLogin && !userId) return redirecionar('/admin/login')
+  if (!rotaLogin && !user) return redirecionar('/admin/login')
 
-  if (userId) {
+  if (user) {
     // Consulta por pedido em vez de reivindicação embutida no token.
     // Decisão D3: a reivindicação vive até o token renovar (por omissão uma
     // hora), e durante esse tempo um administrador removido continuaria a

@@ -1,7 +1,6 @@
 'use client'
 
-import { useActionState, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useActionState, useState } from 'react'
 import { Icon } from '@iconify/react'
 
 import { entrar, type ResultadoEntrada } from '@/lib/actions/auth'
@@ -19,16 +18,11 @@ import { entrar, type ResultadoEntrada } from '@/lib/actions/auth'
  * A aparência mantém-se igual.
  */
 export default function LoginForm() {
-  const router = useRouter()
   const [mostrarSenha, setMostrarSenha] = useState(false)
   const [estado, acao, pendente] = useActionState<ResultadoEntrada | null, FormData>(
     entrar,
     null
   )
-
-  useEffect(() => {
-    if (estado?.ok) router.replace('/admin/produtos')
-  }, [estado, router])
 
   const erro = estado && !estado.ok ? estado.erro : ''
 
@@ -86,7 +80,7 @@ export default function LoginForm() {
         disabled={pendente}
         className="mt-8 bg-marrom-escuro hover:bg-marrom text-branco font-medium px-10 py-2.5 rounded-lg transition-colors disabled:opacity-60"
       >
-        {pendente ? 'Entrando...' : estado?.ok ? 'A abrir…' : 'Entrar'}
+        {pendente ? 'Entrando...' : 'Entrar'}
       </button>
     </form>
   )
