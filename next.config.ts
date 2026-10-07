@@ -46,7 +46,8 @@ const CSP = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
-  'upgrade-insecure-requests',
+  // Em dev local o Supabase é http://127.0.0.1 — não forçar https nesse caso.
+  ...(SUPABASE_HOST.startsWith('https://') ? ['upgrade-insecure-requests'] : []),
 ].join('; ')
 
 const nextConfig: NextConfig = {
@@ -59,8 +60,9 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
+        protocol: new URL(SUPABASE_HOST).protocol.replace(':', '') as 'http' | 'https',
         hostname: new URL(SUPABASE_HOST).hostname,
+        port: new URL(SUPABASE_HOST).port,
         pathname: '/storage/v1/object/public/**',
       },
     ],

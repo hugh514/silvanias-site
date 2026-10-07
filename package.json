@@ -12,6 +12,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "db:types": "supabase gen types typescript --local > types/database.ts",
+    "db:start": "supabase start -x analytics,vector,imgproxy,edge-runtime,realtime",
+    "db:stop": "supabase stop",
     "db:reset": "supabase db reset"
   },
   "dependencies": {
