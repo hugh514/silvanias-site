@@ -12,7 +12,7 @@ import { createClient, verificarAdmin } from '@/lib/supabase/server'
 
 export type ResultadoConteudo =
   | { ok: true }
-  | { ok: false; erro: string; camposComErro?: CamposComErroConteudo }
+  | { ok: false; erro: string; camposComErro?: CamposComErroConteudo; enviado?: Record<string, string> }
 
 const ERRO_GENERICO = 'Não foi possível salvar. Tente novamente.'
 
@@ -53,7 +53,12 @@ export async function guardarConteudo(
 
   const validacao = validarConteudo(chave, lerFormulario(formData))
   if (!validacao.ok) {
-    return { ok: false, erro: 'Verifique os campos destacados.', camposComErro: validacao.camposComErro }
+    // Devolve o que foi digitado: o React limpa o formulário após a ação e a
+    // pessoa perderia o texto que precisa de corrigir.
+    const enviado = Object.fromEntries(
+      [...formData.entries()].filter(([k, v]) => typeof v === 'string' && !k.startsWith('$'))
+    ) as Record<string, string>
+    return { ok: false, erro: 'Verifique os campos destacados.', camposComErro: validacao.camposComErro, enviado }
   }
 
   const supabase = await createClient()

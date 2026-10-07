@@ -55,6 +55,8 @@ export default function ProdutoForm({ produtoExistente }: Props) {
   const [disponivel, setDisponivel] = useState(
     produtoExistente?.disponivel ?? true,
   );
+  const [ordem, setOrdem] = useState(String(produtoExistente?.ordem ?? 0));
+  const [destaque, setDestaque] = useState(produtoExistente?.destaque ?? false);
 
   const [erro, setErro] = useState("");
   const [camposComErro, setCamposComErro] = useState<CamposComErro>({});
@@ -74,7 +76,7 @@ export default function ProdutoForm({ produtoExistente }: Props) {
 
   function tratarResultado(resultado: ResultadoAcao) {
     if (resultado.ok) {
-      router.push("/admin/produtos");
+      router.push(`/admin/produtos?aviso=${editando ? "salvo" : "criado"}`);
       router.refresh();
       return;
     }
@@ -93,6 +95,8 @@ export default function ProdutoForm({ produtoExistente }: Props) {
     dados.set("ingredientes", ingredientes);
     dados.set("descricao", descricao);
     dados.set("disponivel", disponivel ? "sim" : "nao");
+    dados.set("ordem", ordem.trim() || "0");
+    dados.set("destaque", destaque ? "sim" : "nao");
 
     for (const foto of fotos) {
       if (foto.urlExistente) dados.append("fotosExistentes", foto.urlExistente);
@@ -114,7 +118,7 @@ export default function ProdutoForm({ produtoExistente }: Props) {
     iniciarExclusao(async () => {
       const resultado = await removerProduto(produtoExistente.id);
       if (resultado.ok) {
-        router.push("/admin/produtos");
+        router.push("/admin/produtos?aviso=excluido");
         router.refresh();
         return;
       }
@@ -227,6 +231,41 @@ export default function ProdutoForm({ produtoExistente }: Props) {
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-2xl text-preto pointer-events-none"
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="ordem" className="text-xs text-marrom-escuro">
+                Ordem no catálogo
+              </label>
+              <input
+                id="ordem"
+                type="number"
+                inputMode="numeric"
+                step={1}
+                value={ordem}
+                onChange={(e) => setOrdem(e.target.value)}
+                aria-invalid={!!camposComErro.ordem}
+                aria-describedby="ordem-ajuda"
+                className="bg-branco rounded-xl shadow-sm px-4 py-3 text-preto outline-none"
+              />
+              <span id="ordem-ajuda" className="text-xs text-marrom-escuro/60">
+                Menor aparece primeiro.
+              </span>
+              {camposComErro.ordem && (
+                <span className="text-xs text-red-600">{camposComErro.ordem}</span>
+              )}
+            </div>
+
+            <label className="flex items-center gap-3 self-start mt-6 bg-branco rounded-xl shadow-sm px-4 py-3 cursor-pointer text-sm text-marrom-escuro">
+              <input
+                type="checkbox"
+                checked={destaque}
+                onChange={(e) => setDestaque(e.target.checked)}
+                className="w-4 h-4 accent-marrom-escuro"
+              />
+              Destaque na vitrine
+            </label>
           </div>
         </div>
 

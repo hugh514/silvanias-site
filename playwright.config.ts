@@ -5,6 +5,8 @@ const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000'
 export default defineConfig({
   testDir: 'tests/e2e',
   fullyParallel: false,
+  // Os testes partilham a mesma base (criam e apagam produtos): um de cada vez.
+  workers: 1,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'github' : 'list',

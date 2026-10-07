@@ -28,11 +28,8 @@ export default function LoginForm() {
 
   return (
     <form action={acao} className="w-full flex flex-col items-center">
-      <h1 className="hidden md:block text-3xl font-bold text-preto mb-8">
-        LOGIN
-      </h1>
-      <h1 className="md:hidden text-xl font-bold text-preto mb-4">
-        Login
+      <h1 className="font-titulo text-2xl md:text-3xl text-marrom-escuro mb-6 md:mb-8">
+        Entrar no painel
       </h1>
 
       <div className="w-full flex flex-col gap-4">
@@ -42,6 +39,7 @@ export default function LoginForm() {
             type="email"
             name="email"
             placeholder="Email"
+            aria-label="Email"
             autoComplete="email"
             required
             className="bg-transparent outline-none w-full text-preto placeholder:text-cor-pele"
@@ -54,6 +52,7 @@ export default function LoginForm() {
             type={mostrarSenha ? 'text' : 'password'}
             name="senha"
             placeholder="Senha"
+            aria-label="Senha"
             autoComplete="current-password"
             required
             className="bg-transparent outline-none w-full text-preto placeholder:text-cor-pele"

@@ -28,8 +28,20 @@ import plus from '@iconify-icons/mdi/plus'
 import sproutOutline from '@iconify-icons/mdi/sprout-outline'
 import star from '@iconify-icons/mdi/star'
 import whatsapp from '@iconify-icons/mdi/whatsapp'
+import packageVariant from '@iconify-icons/mdi/package-variant'
+import textBoxEditOutline from '@iconify-icons/mdi/text-box-edit-outline'
+import openInNew from '@iconify-icons/mdi/open-in-new'
+import pencilOutline from '@iconify-icons/mdi/pencil-outline'
+import checkCircleOutline from '@iconify-icons/mdi/check-circle-outline'
+import alertCircleOutline from '@iconify-icons/mdi/alert-circle-outline'
 
 export const ICONES = {
+  'mdi:package-variant': packageVariant,
+  'mdi:text-box-edit-outline': textBoxEditOutline,
+  'mdi:open-in-new': openInNew,
+  'mdi:pencil-outline': pencilOutline,
+  'mdi:check-circle-outline': checkCircleOutline,
+  'mdi:alert-circle-outline': alertCircleOutline,
   'mdi:arrow-left': arrowLeft,
   'mdi:arrow-top-right': arrowTopRight,
   'mdi:chevron-down': chevronDown,

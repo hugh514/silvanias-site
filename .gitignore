@@ -45,3 +45,5 @@ next-env.d.ts
 
 # Playwright MCP (capturas locais)
 .playwright-mcp/
+/test-results/
+/playwright-report/

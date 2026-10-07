@@ -19,14 +19,12 @@ export default function BotaoSair() {
     <button
       type="button"
       disabled={saindo}
+      aria-label="Sair"
       onClick={() => iniciar(async () => { await sair() })}
-      className="flex items-center justify-center gap-2 bg-branco shadow-sm text-marrom-escuro
-                 font-medium rounded-xl px-5 whitespace-nowrap transition-colors
-                 hover:text-marrom disabled:opacity-60 text-xs lg:text-sm"
-      style={{ height: 'var(--campo-altura)' }}
+      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-branco/70 hover:text-branco hover:bg-branco/10 transition-colors disabled:opacity-60 shrink-0"
     >
-      <Icon icon="mdi:logout" className="text-lg shrink-0" aria-hidden="true" />
-      {saindo ? 'Saindo...' : 'Sair'}
+      <Icon icon="mdi:logout" className="text-xl shrink-0" aria-hidden="true" />
+      <span className="hidden sm:inline">{saindo ? 'Saindo...' : 'Sair'}</span>
     </button>
   )
 }

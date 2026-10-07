@@ -4,6 +4,9 @@ import { createClient } from '@supabase/supabase-js'
 const urlSite = process.env.NEXT_PUBLIC_SITE_URL || 'https://silvanias-site.vercel.app'
 
 // Sem cookies: o sitemap não tem request, e o catálogo disponível é público.
+// Regera de hora a hora: sem isto o sitemap fica congelado no build e não vê produtos novos.
+export const revalidate = 3600
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
