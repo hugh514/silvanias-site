@@ -8,8 +8,11 @@
  * detetar o projeto de produção. Falha fechado: na dúvida, recusa.
  */
 
-/** Identificador do projeto Supabase de PRODUÇÃO. Nunca deve ser alvo de testes. */
-const PROJETO_PRODUCAO = 'khfebjavstjyzfhxwmvm'
+/**
+ * Projetos Supabase de PRODUÇÃO. Nunca devem ser alvo de testes.
+ * `khfeb…` é o antigo; `dcfs…` é o atual (o que está no `.env`).
+ */
+const PROJETOS_PRODUCAO = ['khfebjavstjyzfhxwmvm', 'dcfskppmsqaztnojuyhc']
 
 function abortar(motivo: string): never {
   // Escrito diretamente em stderr: um throw dentro de setupFiles pode ser
@@ -34,8 +37,9 @@ if (!url) {
   abortar('NEXT_PUBLIC_SUPABASE_URL não está definida.')
 }
 
-if (url.includes(PROJETO_PRODUCAO)) {
-  abortar(`NEXT_PUBLIC_SUPABASE_URL aponta para o projeto de PRODUÇÃO (${PROJETO_PRODUCAO}).`)
+const producao = PROJETOS_PRODUCAO.find((id) => url.includes(id))
+if (producao) {
+  abortar(`NEXT_PUBLIC_SUPABASE_URL aponta para o projeto de PRODUÇÃO (${producao}).`)
 }
 
 if (!process.env.SUPABASE_SECRET_KEY) {
