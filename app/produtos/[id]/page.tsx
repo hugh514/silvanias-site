@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 
@@ -7,6 +8,41 @@ import GaleriaProduto from '@/components/vitrine/GaleriaProduto'
 import Rodape from '@/components/vitrine/Rodape'
 import { gerarLinkWhatsapp } from '@/lib/constants'
 import { createClient } from '@/lib/supabase/server'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const supabase = await createClient()
+
+  const { data: produto } = await supabase
+    .from('produtos')
+    .select('nome, descricao, fotos')
+    .eq('id', id)
+    .eq('disponivel', true)
+    .maybeSingle()
+
+  if (!produto) return { title: 'Produto' }
+
+  const descricao = produto.descricao
+    ? produto.descricao.length > 160
+      ? `${produto.descricao.slice(0, 157).trimEnd()}...`
+      : produto.descricao
+    : undefined
+  const foto = produto.fotos?.[0]
+
+  return {
+    title: produto.nome,
+    description: descricao,
+    openGraph: {
+      title: produto.nome,
+      description: descricao,
+      ...(foto && { images: [foto] }),
+    },
+  }
+}
 
 export default async function ProdutoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
