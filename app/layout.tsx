@@ -47,7 +47,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR" className={`${poppins.variable} ${fraunces.variable}`}>
+    <html lang="pt-BR" data-scroll-behavior="smooth" className={`${poppins.variable} ${fraunces.variable}`}>
       <body className="font-sans antialiased">
         {children}
         <Analytics />

@@ -129,7 +129,7 @@ export default function UploadFotos({ fotos, onChange }: Props) {
               <button
                 type="button"
                 onClick={() => setFotoAmpliada(foto)}
-                className="w-full h-full cursor-zoom-in"
+                className="relative block w-full h-full cursor-zoom-in"
                 aria-label="Ampliar foto"
               >
                 <Image
