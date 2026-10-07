@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Icon } from '@iconify/react'
+import { Icone as Icon } from '@/components/ui/Icone'
 import Link from 'next/link'
 import ProdutoCard from './ProdutoCard'
 import BotaoSair from './BotaoSair'

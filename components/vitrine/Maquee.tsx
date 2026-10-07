@@ -1,4 +1,4 @@
-import { Icon } from '@iconify/react'
+import { Icone as Icon } from '@/components/ui/Icone'
 
 const MENSAGEM = 'A arte de transformar paixão em sabor'
 

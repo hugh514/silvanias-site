@@ -1,130 +1,95 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import Image from 'next/image'
+
+import { Icone as Icon } from '@/components/ui/Icone'
 
 type Props = {
   fotos: string[]
   nome: string
 }
 
-const INTERVALO_AUTOPLAY = 5000
+const LIMIAR_ARRASTE = 40
 
 export default function GaleriaProduto({ fotos, nome }: Props) {
-  const [indiceAtual, setIndiceAtual] = useState(0)
-  const arrastando = useRef(false)
-  const inicioX = useRef(0)
+  const [atual, setAtual] = useState(0)
+  const inicioX = useRef<number | null>(null)
+  const total = fotos.length
 
-  const temFotos = fotos.length > 0
-  const totalFotos = fotos.length
-
-  // Auto-play — reinicia o timer sempre que o índice muda (manual ou automático)
-  useEffect(() => {
-    if (totalFotos <= 1) return
-    const timer = setInterval(() => {
-      setIndiceAtual((i) => (i + 1) % totalFotos)
-    }, INTERVALO_AUTOPLAY)
-    return () => clearInterval(timer)
-  }, [indiceAtual, totalFotos])
-
-  function irPara(indice: number) {
-    setIndiceAtual(indice)
-  }
-
-  function proxima() {
-    setIndiceAtual((i) => (i + 1) % totalFotos)
-  }
-
-  function anterior() {
-    setIndiceAtual((i) => (i - 1 + totalFotos) % totalFotos)
-  }
-
-  function onPointerDown(e: React.PointerEvent) {
-    arrastando.current = true
-    inicioX.current = e.clientX
-  }
-
-  function onPointerUp(e: React.PointerEvent) {
-    if (!arrastando.current) return
-    arrastando.current = false
-    const delta = e.clientX - inicioX.current
-    const LIMIAR = 40 // pixels mínimos para considerar um arraste válido
-
-    if (delta > LIMIAR) anterior()
-    else if (delta < -LIMIAR) proxima()
-  }
-
-  if (!temFotos) {
+  if (total === 0) {
     return (
-      <div className="w-full aspect-square bg-branco rounded-2xl shadow-sm flex items-center justify-center text-cor-pele">
-        Sem foto
+      <div className="w-full aspect-4/5 bg-branco rounded-3xl flex items-center justify-center text-cor-pele">
+        <Icon icon="mdi:image-off-outline" className="text-4xl" aria-label="Sem foto" />
       </div>
     )
   }
 
+  const irPara = (i: number) => setAtual((i + total) % total)
+
   return (
     <div className="flex flex-col gap-4">
-      {/* Desktop: destaque + miniaturas clicáveis */}
-      <div className="hidden md:block">
-        <div className="relative w-full aspect-square bg-branco rounded-2xl shadow-sm overflow-hidden">
-          <Image
-            src={fotos[indiceAtual]}
-            alt={nome}
-            fill
-            className="object-contain p-6"
-            priority
-          />
-        </div>
+      <div
+        className="relative w-full aspect-4/5 bg-branco rounded-3xl overflow-hidden touch-pan-y"
+        onPointerDown={(e) => (inicioX.current = e.clientX)}
+        onPointerUp={(e) => {
+          if (inicioX.current === null) return
+          const delta = e.clientX - inicioX.current
+          inicioX.current = null
+          if (delta > LIMIAR_ARRASTE) irPara(atual - 1)
+          else if (delta < -LIMIAR_ARRASTE) irPara(atual + 1)
+        }}
+      >
+        <Image
+          src={fotos[atual]}
+          alt={`${nome} — foto ${atual + 1} de ${total}`}
+          fill
+          priority
+          sizes="(min-width: 768px) 50vw, 100vw"
+          className="object-cover select-none pointer-events-none"
+          draggable={false}
+        />
 
-        {totalFotos > 1 && (
-          <div className="flex gap-3 mt-4">
-            {fotos.map((foto, i) =>
-              i === indiceAtual ? null : (
-                <button
-                  key={foto + i}
-                  type="button"
-                  onClick={() => irPara(i)}
-                  className="relative w-20 h-20 bg-branco rounded-xl shadow-sm overflow-hidden shrink-0
-                             ring-1 ring-transparent hover:ring-marrom-claro transition-all"
-                >
-                  <Image src={foto} alt={nome} fill className="object-contain p-2" />
-                </button>
-              )
-            )}
-          </div>
+        {total > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={() => irPara(atual - 1)}
+              aria-label="Foto anterior"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-branco/85 hover:bg-branco flex items-center justify-center text-marrom-escuro shadow"
+            >
+              <Icon icon="mdi:chevron-left" className="text-2xl" />
+            </button>
+            <button
+              type="button"
+              onClick={() => irPara(atual + 1)}
+              aria-label="Próxima foto"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-branco/85 hover:bg-branco flex items-center justify-center text-marrom-escuro shadow"
+            >
+              <Icon icon="mdi:chevron-right" className="text-2xl" />
+            </button>
+          </>
         )}
       </div>
 
-      {/* Mobile: destaque com drag + dots */}
-      <div className="md:hidden">
-        <div
-          className="relative w-full aspect-square bg-branco rounded-2xl shadow-sm overflow-hidden touch-pan-y"
-          onPointerDown={onPointerDown}
-          onPointerUp={onPointerUp}
-        >
-          <Image
-            src={fotos[indiceAtual]}
-            alt={nome}
-            fill
-            className="object-contain p-6 pointer-events-none select-none"
-            draggable={false}
-            priority
-          />
+      {total > 1 && (
+        <div className="flex gap-3">
+          {fotos.map((foto, i) => (
+            <button
+              key={foto + i}
+              type="button"
+              onClick={() => setAtual(i)}
+              aria-label={`Ver foto ${i + 1}`}
+              aria-current={i === atual}
+              className={`relative w-16 h-20 md:w-20 md:h-24 rounded-xl overflow-hidden shrink-0 ring-2 transition ${
+                i === atual ? 'ring-marrom-escuro' : 'ring-transparent opacity-70 hover:opacity-100'
+              }`}
+            >
+              <Image src={foto} alt="" fill sizes="80px" className="object-cover" />
+            </button>
+          ))}
         </div>
-
-        {totalFotos > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-3">
-            {fotos.map((_, i) => (
-              <span
-                key={i}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  i === indiceAtual ? 'bg-marrom-escuro' : 'bg-marrom-claro/40'
-                }`}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   )
 }

@@ -40,7 +40,7 @@ insert into public.produtos (nome, categoria, descricao, ingredientes, disponive
   ('Nibs de Cacau', 'Derivados do Cacau',
    'Pedaços de amêndoa de cacau torrada, crocantes e sem açúcar.',
    'Amêndoas de cacau torradas.', true,
-   array['/images/categoria-derivados-v2.png']),
+   array['/images/categoria-derivados-v2.png', '/images/imagem-quem-somos-1-v2.png']),
   ('Manteiga de Cacau', 'Derivados do Cacau',
    'Manteiga de cacau pura, para culinária e cosmética.',
    'Manteiga de cacau.', true,

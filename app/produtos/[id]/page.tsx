@@ -1,100 +1,81 @@
-import { createClient } from "@/lib/supabase/server";
-import { notFound } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
-import { Icon } from "@iconify/react";
-import GaleriaProduto from "@/components/vitrine/GaleriaProduto";
-import { gerarLinkWhatsapp } from "@/lib/constants";
+import { notFound } from 'next/navigation'
+import Link from 'next/link'
 
-export default async function ProdutoPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const supabase = await createClient();
+import { Icone as Icon } from '@/components/ui/Icone'
+import Cabecalho from '@/components/vitrine/Cabecalho'
+import GaleriaProduto from '@/components/vitrine/GaleriaProduto'
+import Rodape from '@/components/vitrine/Rodape'
+import { gerarLinkWhatsapp } from '@/lib/constants'
+import { createClient } from '@/lib/supabase/server'
+
+export default async function ProdutoPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const supabase = await createClient()
 
   const { data: produto, error } = await supabase
-    .from("produtos")
-    .select("id, nome, ingredientes, descricao, fotos")
-    .eq("id", id)
-    .eq("disponivel", true)
-    .single();
+    .from('produtos')
+    .select('id, nome, categoria, ingredientes, descricao, fotos')
+    .eq('id', id)
+    .eq('disponivel', true)
+    .single()
 
-  if (error || !produto) {
-    notFound();
-  }
+  if (error || !produto) notFound()
+
+  const linkPedido = gerarLinkWhatsapp(
+    `Olá! Vi o produto "${produto.nome}" no site de vocês e fiquei interessado(a). Pode me passar mais informações?`
+  )
 
   return (
-    <main className="min-h-screen bg-branco-falso px-6 py-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Cabeçalho: voltar + logo */}
-        <div className="flex items-center justify-between mb-10">
-          <Link
-            href="/#catalogo"
-            className="w-12 h-12 rounded-full bg-marrom-escuro hover:bg-marrom flex items-center justify-center shrink-0"
-            aria-label="Voltar"
-          >
-            <Icon icon="mdi:arrow-left" className="text-branco text-xl" />
-          </Link>
+    <>
+      <Cabecalho />
+      <main className="bg-branco-falso px-6 py-8 md:py-14">
+        <div className="max-w-6xl mx-auto">
+          <nav aria-label="Navegação estrutural" className="mb-8 text-sm text-marrom-escuro/70">
+            <Link href="/#catalogo" className="inline-flex items-center gap-1 hover:text-marrom-escuro">
+              <Icon icon="mdi:arrow-left" />
+              Voltar ao catálogo
+            </Link>
+          </nav>
 
-          {/*
-        logo
-          */}
-          <Image
-            src="/images/logo.png"
-            alt="Silvania's Cacau"
-            width={140}
-            height={140}
-            className="w-24 md:w-32 h-auto"
-          />
-        </div>
-
-        {/* Título — só visível no mobile, acima da galeria */}
-        <h1 className="md:hidden text-2xl font-medium text-marrom-escuro mb-4">
-          {produto.nome}
-        </h1>
-
-        <div className="flex flex-col md:flex-row gap-10">
-          {/* Coluna da galeria */}
-          <div className="md:flex-1">
+          <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start">
             <GaleriaProduto fotos={produto.fotos ?? []} nome={produto.nome} />
-          </div>
 
-          {/* Coluna de informações */}
-          <div className="md:flex-1 flex flex-col gap-6">
-            <h1 className="hidden md:block text-3xl font-medium text-marrom-escuro">
-              {produto.nome}
-            </h1>
+            <div className="flex flex-col gap-6 md:sticky md:top-24">
+              <span className="text-xs font-medium uppercase tracking-[0.18em] text-cor-pele">
+                {produto.categoria}
+              </span>
+              <h1 className="font-titulo text-3xl md:text-5xl font-medium text-marrom-escuro leading-tight">
+                {produto.nome}
+              </h1>
 
-            <div className="border-t border-marrom-escuro/20 pt-4">
-              {produto.ingredientes && (
-                <p className="text-marrom-escuro">
-                  <span className="font-semibold">Ingredientes: </span>
-                  {produto.ingredientes}
-                </p>
-              )}
               {produto.descricao && (
-                <p className="text-marrom-escuro mt-2">{produto.descricao}</p>
+                <p className="text-marrom-escuro/80 leading-relaxed md:text-lg">{produto.descricao}</p>
               )}
-            </div>
 
-            <a
-              href={gerarLinkWhatsapp(
-                `Olá! Vi o produto "${produto.nome}" no site de vocês e fiquei interessado(a). Pode me passar mais informações?`,
+              {produto.ingredientes && (
+                <div className="rounded-2xl bg-branco p-5">
+                  <p className="text-xs uppercase tracking-[0.18em] text-cor-pele mb-2">Ingredientes</p>
+                  <p className="text-marrom-escuro">{produto.ingredientes}</p>
+                </div>
               )}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="self-start md:self-auto flex items-center justify-center gap-2
-             bg-marrom-escuro hover:bg-marrom text-branco font-medium
-             px-10 py-3.5 rounded-2xl transition-colors mt-4 w-full md:w-fit"
-            >
-              <Icon icon="mdi:whatsapp" className="text-xl" />
-              Pedir
-            </a>
+
+              <a
+                href={linkPedido}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 bg-marrom-escuro hover:bg-marrom text-branco font-medium px-8 py-4 rounded-full transition-colors w-full md:w-fit"
+              >
+                <Icon icon="mdi:whatsapp" className="text-xl" />
+                Pedir pelo WhatsApp
+              </a>
+              <p className="text-sm text-marrom-escuro/60">
+                Valores e condições são combinados direto com a gente na conversa.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </main>
-  );
+      </main>
+      <Rodape />
+    </>
+  )
 }

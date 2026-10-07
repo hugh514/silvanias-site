@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useState } from 'react'
-import { Icon } from '@iconify/react'
+import { Icone as Icon } from '@/components/ui/Icone'
 
 import { entrar, type ResultadoEntrada } from '@/lib/actions/auth'
 

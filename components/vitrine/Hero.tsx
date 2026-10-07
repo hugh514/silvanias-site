@@ -1,65 +1,68 @@
 import Image from 'next/image'
+import { Icone as Icon } from '@/components/ui/Icone'
+
+import { gerarLinkWhatsapp, MENSAGEM_ZAP_GERAL } from '@/lib/constants'
+
+const DIFERENCIAIS = [
+  { icone: 'mdi:sprout-outline', texto: 'Cacau próprio' },
+  { icone: 'mdi:hand-heart-outline', texto: 'Feito à mão' },
+  { icone: 'mdi:map-marker-path', texto: 'Do cultivo à barra' },
+] as const
 
 export default function Hero() {
   return (
-    <section className="bg-branco-falso px-6 py-12 md:py-20">
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-16">
-        {/* Coluna de texto (logo + título + descrição + botão) */}
-        <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left gap-6 w-full">
-          {/*
-            INSERIR LOGO AQUI
-            Coloque o arquivo em: public/images/logo.png
-            (mesmo arquivo já usado na tela de login)
-          */}
-          <Image
-            src="/images/logo.png"
-            alt="Silvania's Cacau"
-            width={280}
-            height={280}
-            className="w-52 md:w-64 h-auto"
-            priority
-          />
+    <section className="bg-branco-falso px-6 pt-10 pb-16 md:pt-16 md:pb-24">
+      <div className="max-w-6xl mx-auto grid md:grid-cols-2 items-center gap-10 md:gap-16">
+        <div className="flex flex-col gap-6">
+          <span className="text-xs font-medium uppercase tracking-[0.18em] text-cor-pele">
+            Agroindústria de cacau · Amazônia
+          </span>
 
-          <h1 className="text-3xl md:text-4xl font-medium text-marrom-escuro leading-tight">
+          <h1 className="font-titulo text-4xl sm:text-5xl lg:text-6xl font-medium text-marrom-escuro leading-[1.05]">
             Chocolates artesanais que dão água na boca
           </h1>
 
-          {/* Imagem de destaque — só aparece aqui no mobile, entre título e descrição */}
-          <div className="md:hidden relative w-full max-w-xs aspect-square bg-branco rounded-2xl shadow-sm">
-            {/*
-              INSERIR FOTO DE DESTAQUE AQUI
-              Coloque o arquivo em: public/images/hero-produto.png
-            */}
-            <Image
-              src="/images/hero-v3.png"
-              alt="Chocolate Silvania's Cacau"
-              fill
-              className="overflow-hidden p-6"              
-            />
-          </div>
-
-          <p className="text-marrom-escuro/80 max-w-md">
-            Todos os produtos de Silvania&apos;S cacau são desenvolvidos com
-            cacau próprio, garantindo origem, qualidade e total
-            rastreabilidade do cultivo à produção.
+          <p className="text-marrom-escuro/80 text-base md:text-lg max-w-md leading-relaxed">
+            Todos os produtos da Silvania&apos;s Cacau são feitos com cacau próprio, garantindo origem,
+            qualidade e rastreabilidade do cultivo à produção.
           </p>
 
-           <a
-            href="#catalogo"
-            className="bg-marrom-escuro hover:bg-marrom text-branco font-medium px-8 py-3.5 rounded-xl transition-colors">
-         
-            Ver catálogo
-          </a>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href="#catalogo"
+              className="bg-marrom-escuro hover:bg-marrom text-branco font-medium px-7 py-3.5 rounded-full transition-colors"
+            >
+              Ver catálogo
+            </a>
+            <a
+              href={gerarLinkWhatsapp(MENSAGEM_ZAP_GERAL)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 border border-marrom-escuro/30 hover:border-marrom-escuro text-marrom-escuro font-medium px-7 py-3.5 rounded-full transition-colors"
+            >
+              <Icon icon="mdi:whatsapp" className="text-xl" />
+              Pedir pelo WhatsApp
+            </a>
+          </div>
+
+          <ul className="flex flex-wrap gap-x-6 gap-y-2 pt-2 text-sm text-marrom-escuro/80">
+            {DIFERENCIAIS.map((d) => (
+              <li key={d.texto} className="flex items-center gap-2">
+                <Icon icon={d.icone} className="text-cor-pele text-lg" />
+                {d.texto}
+              </li>
+            ))}
+          </ul>
         </div>
 
-        {/* Imagem de destaque — só aparece aqui no desktop, ao lado do texto */}
-        <div className="hidden md:block relative flex-1 max-w-lg aspect-square bg-branco rounded-2xl shadow-sm">
-          {/* Mesma imagem do bloco mobile acima */}
+        <div className="relative aspect-4/5 md:aspect-square w-full rounded-3xl overflow-hidden shadow-[0_24px_60px_-24px_rgba(53,21,3,0.45)]">
           <Image
             src="/images/hero-v3.png"
-            alt="Chocolate Silvania's Cacau"
+            alt="Barra de chocolate Silvania's Cacau ao lado de um café"
             fill
-            className="overflow-hidden p-10"
+            priority
+            sizes="(min-width: 768px) 50vw, 100vw"
+            className="object-cover"
           />
         </div>
       </div>

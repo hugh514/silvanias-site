@@ -13,6 +13,12 @@
   --color-rodape: #C4A882;
 
   --font-sans: var(--font-poppins), sans-serif;
+  --font-titulo: var(--font-fraunces), Georgia, serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 
 body {
@@ -42,5 +48,14 @@ button:disabled {
 }
 
 .animate-marquee {
-  animation: marquee 40s linear infinite;
+  animation: marquee 60s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-marquee {
+    animation: none;
+  }
 }

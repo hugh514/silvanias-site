@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { Icon } from '@iconify/react'
+import { Icone as Icon } from '@/components/ui/Icone'
 import Image from 'next/image'
 
 import { MAX_FOTOS } from '@/lib/schemas/produto'

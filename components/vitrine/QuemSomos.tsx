@@ -1,75 +1,51 @@
 import Image from 'next/image'
 
+const VALORES = [
+  { titulo: 'Origem', texto: 'Cacau cultivado por nós, na Amazônia.' },
+  { titulo: 'Respeito ao fruto', texto: 'Produção que valoriza a biodiversidade.' },
+  { titulo: 'Chocolate de verdade', texto: 'Intenso, cremoso e cheio de história.' },
+]
+
 export default function QuemSomos() {
   return (
-    <section className="bg-branco-falso px-6 py-12 md:py-20">
-      <div className="max-w-6xl mx-auto">
-        <style>{`
-          @media (min-width: 768px) {
-            .quem-somos-grid {
-              grid-template-areas:
-                "img1 titulo"
-                "img1 texto"
-                "img1 img2" !important;
-              grid-template-columns: 0.85fr 1.15fr !important;
-              grid-template-rows: auto auto 1fr !important;
-            }
-          }
-        `}</style>
+    <section id="quem-somos" className="bg-branco-falso px-6 py-16 md:py-24">
+      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+        <div className="relative aspect-4/5 w-full rounded-3xl overflow-hidden">
+          <Image
+            src="/images/imagem-quem-somos-2-v2.png"
+            alt="Pé de cacau carregado de frutos na Amazônia"
+            fill
+            sizes="(min-width: 768px) 50vw, 100vw"
+            className="object-cover"
+          />
+        </div>
 
-        <div
-          className="quem-somos-grid grid gap-x-10 gap-y-4 md:gap-y-6"
-          style={{
-            gridTemplateAreas: `"titulo titulo" "img1 texto" "img2 img2"`,
-            gridTemplateColumns: '1fr 1fr',
-          }}
-        >
-          {/* Título */}
-          <h2
-            style={{ gridArea: 'titulo' }}
-            className="text-2xl md:text-3xl font-medium text-marrom-escuro self-start"
-          >
-            Quem somos?
+        <div className="flex flex-col gap-6">
+          <span className="text-xs font-medium uppercase tracking-[0.18em] text-cor-pele">Quem somos</span>
+          <h2 className="font-titulo text-3xl md:text-5xl font-medium text-marrom-escuro leading-tight">
+            Aqui na Amazônia o cacau encontra seu lar
           </h2>
-
-          {/* Imagem 1 — pé de cacau (retrato) */}
-          <div
-            style={{ gridArea: 'img1' }}
-            className="relative w-full h-full min-h-65 md:min-h-105 rounded-2xl overflow-hidden"
-          >
-            <Image
-              src="/images/imagem-quem-somos-2-v2.png"
-              alt="Pé de cacau na Amazônia"
-              fill
-              className="object-cover"
-              sizes="(min-width: 768px) 40vw, 45vw"
-            />
-          </div>
-
-          {/* Texto */}
-          <p
-            style={{ gridArea: 'texto' }}
-            className="text-marrom-escuro leading-relaxed text-justify"
-          >
-            Agroindústria de cacau, aqui na Amazônia o cacau encontra seu lar
-            perfeito. Cultivamos o fruto que da vida aos nossos produtos.
-            Silvania&apos;S cacau nasce do encontro entre o cultivo com a arte
-            de transformar! cada produto respeita o fruto, valoriza a
-            biodiversidade e entrega chocolate de verdade, intenso, cremoso e
-            cheio de história.
+          <p className="text-marrom-escuro/80 leading-relaxed md:text-lg">
+            Somos uma agroindústria de cacau. Cultivamos o fruto que dá vida aos nossos produtos, e a Silvania&apos;s
+            Cacau nasce desse encontro entre o cultivo e a arte de transformar.
           </p>
 
-          {/* Imagem 2 — chocolate/cacau aberto (paisagem) */}
-          <div
-            style={{ gridArea: 'img2' }}
-            className="relative w-full aspect-video rounded-2xl overflow-hidden"
-          >
+          <ul className="grid sm:grid-cols-3 gap-4 pt-2">
+            {VALORES.map((v) => (
+              <li key={v.titulo} className="rounded-2xl bg-branco p-4">
+                <p className="font-medium text-marrom-escuro">{v.titulo}</p>
+                <p className="text-sm text-marrom-escuro/70 mt-1">{v.texto}</p>
+              </li>
+            ))}
+          </ul>
+
+          <div className="relative aspect-video w-full rounded-2xl overflow-hidden">
             <Image
               src="/images/imagem-quem-somos-1-v2.png"
               alt="Chocolate, manteiga de cacau e amêndoas de cacau"
               fill
+              sizes="(min-width: 768px) 50vw, 100vw"
               className="object-cover"
-              sizes="100vw"
             />
           </div>
         </div>

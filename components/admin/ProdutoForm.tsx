@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Icon } from "@iconify/react";
+import { Icone as Icon } from '@/components/ui/Icone'
 
 import { CATEGORIAS } from "@/lib/constants";
 import {

@@ -1,82 +1,60 @@
-'use client'
+import { Icone as Icon } from '@/components/ui/Icone'
 
-import { useState } from 'react'
-import { Icon } from '@iconify/react'
+import { ENDERECO } from '@/lib/constants'
 
 export default function OndeNosEncontrar() {
-  const latitude = -11.911265741721149
-  const longitude = -61.78445093828045
-
-  const [carregando, setCarregando] = useState(true)
-
-  // URL do iframe usando coordenadas (modo "pindrop", sem mostrar lugares vizinhos)
-  const mapaEmbedUrl = `https://www.google.com/maps?q=${latitude},${longitude}&z=17&output=embed`
-
-  // Link do botão continua podendo usar o endereço em texto normalmente
+  const { latitude, longitude } = ENDERECO
+  const mapaEmbedUrl = `https://www.google.com/maps?q=${latitude},${longitude}&z=16&output=embed`
   const mapaLinkUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`
 
   return (
-    <section className="bg-branco px-6 py-12 md:py-20">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row gap-8 md:gap-10 items-start">
-          {/* Coluna de texto */}
-          <div className="w-full md:flex-1 flex flex-col gap-5">
-            <h2 className="text-2xl md:text-3xl font-medium text-marrom-escuro">
-              Onde nos encontrar?
-            </h2>
+    <section id="onde-estamos" className="bg-branco px-6 py-16 md:py-24">
+      <div className="max-w-6xl mx-auto grid md:grid-cols-[2fr_3fr] gap-10 items-stretch">
+        <div className="flex flex-col gap-6 justify-center">
+          <span className="text-xs font-medium uppercase tracking-[0.18em] text-cor-pele">Onde estamos</span>
+          <h2 className="font-titulo text-3xl md:text-5xl font-medium text-marrom-escuro">Venha nos visitar</h2>
 
-            <div className="flex gap-2">
-              <Icon
-                icon="mdi:map-marker-outline"
-                className="text-marrom-escuro text-2xl shrink-0"
-              />
-              <p className="text-marrom-escuro">
-                R. Sete de Setembro, 1978 - Setor 4
-                <br />
-                Santa Luzia D&apos;Oeste - RO
-                <br />
-                CEP 76950-000
-              </p>
-            </div>
+          <address className="not-italic flex gap-3 text-marrom-escuro">
+            <Icon icon="mdi:map-marker-outline" className="text-2xl shrink-0 text-cor-pele" />
+            <span>
+              {ENDERECO.rua}
+              <br />
+              {ENDERECO.cidade}
+              <br />
+              {ENDERECO.cep}
+            </span>
+          </address>
 
-            <div className="border-t border-marrom-escuro/30 w-full max-w-62.5" />
+          <a
+            href={mapaLinkUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 self-start bg-marrom-escuro hover:bg-marrom text-branco font-medium px-7 py-3.5 rounded-full transition-colors"
+          >
+            <Icon icon="mdi:directions" className="text-xl" />
+            Como chegar
+          </a>
+        </div>
 
-           <a 
-              href={mapaLinkUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 self-start
-                         bg-marrom-escuro hover:bg-marrom text-branco font-medium
-                         px-8 py-3.5 rounded-xl transition-colors w-fit"
-            >
-              <Icon icon="mdi:map-outline" className="text-xl" />
-              Ver no mapa
-            </a>
-          </div>
-
-          {/* Coluna do mapa (interativo, desce no mobile) */}
-          <div className="w-full md:flex-1">
-            <div className="relative w-full aspect-4/3 md:aspect-16/10 rounded-2xl overflow-hidden shadow-sm bg-branco-falso">
-              {carregando && (
-                <div className="absolute inset-0 flex items-center justify-center z-10">
-                  <Icon
-                    icon="mdi:loading"
-                    className="text-marrom-escuro text-4xl animate-spin"
-                  />
-                </div>
-              )}
-
-              <iframe
-                src={mapaEmbedUrl}
-                onLoad={() => setCarregando(false)}
-                className="absolute inset-0 w-full h-full border-0"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Localização da Silvania's Cacau no mapa"
-                allowFullScreen
-              />
-            </div>
-          </div>
+        {/* O fundo com o link fica por baixo: se o iframe não carregar, ainda há saída. */}
+        <div className="relative w-full aspect-4/3 md:aspect-auto md:min-h-96 rounded-3xl overflow-hidden bg-branco-falso">
+          <a
+            href={mapaLinkUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-marrom-escuro/70"
+          >
+            <Icon icon="mdi:map-outline" className="text-4xl" />
+            <span className="text-sm">Abrir no Google Maps</span>
+          </a>
+          <iframe
+            src={mapaEmbedUrl}
+            className="absolute inset-0 w-full h-full border-0"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Localização da Silvania's Cacau no mapa"
+            allowFullScreen
+          />
         </div>
       </div>
     </section>

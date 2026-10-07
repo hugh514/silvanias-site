@@ -1,7 +1,7 @@
 'use client'
 
 import { useTransition } from 'react'
-import { Icon } from '@iconify/react'
+import { Icone as Icon } from '@/components/ui/Icone'
 
 import { sair } from '@/lib/actions/auth'
 

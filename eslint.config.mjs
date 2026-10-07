@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Worktrees locais e artefactos do Playwright MCP.
+    ".worktrees/**",
+    ".playwright-mcp/**",
   ]),
 ]);
 

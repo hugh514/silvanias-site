@@ -42,3 +42,6 @@ next-env.d.ts
 
 # git worktrees (isolamento local)
 .worktrees/
+
+# Playwright MCP (capturas locais)
+.playwright-mcp/
