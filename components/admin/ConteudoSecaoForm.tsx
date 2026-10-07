@@ -1,10 +1,11 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useState } from 'react'
 
 import { Icone as Icon } from '@/components/ui/Icone'
 import { guardarConteudo, type ResultadoConteudo } from '@/lib/actions/conteudo-site'
 import type { ChaveConteudo } from '@/lib/schemas/conteudo-site'
+import PreviaConteudo from './PreviaConteudo'
 
 export type CampoConteudo = {
   nome: string
@@ -30,9 +31,24 @@ export default function ConteudoSecaoForm({ chave, titulo, descricao, campos, va
   const erros = estado && !estado.ok ? (estado.camposComErro ?? {}) : {}
   const atuais = estado && !estado.ok && estado.enviado ? estado.enviado : valores
 
+  // Valores ao vivo para a prévia. Recomeçam sempre que o formulário remonta.
+  const chaveAtuais = JSON.stringify(atuais)
+  const [vivos, setVivos] = useState<Record<string, string | number>>(atuais)
+  const [base, setBase] = useState(chaveAtuais)
+  if (base !== chaveAtuais) {
+    setBase(chaveAtuais)
+    setVivos(atuais)
+  }
+
   return (
     // `key` remonta os campos a cada resposta, para mostrarem `atuais` (texto digitado após erro).
-    <form key={JSON.stringify(atuais)} action={acao} className="bg-branco rounded-2xl shadow-sm p-5 md:p-6 flex flex-col gap-4">
+    <form
+      key={chaveAtuais}
+      action={acao}
+      onInput={(e) => setVivos(Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>)}
+      className="bg-branco rounded-2xl shadow-sm p-5 md:p-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]"
+    >
+      <div className="flex flex-col gap-4 min-w-0">
       <div>
         <h2 className="font-medium text-marrom-escuro">{titulo}</h2>
         <p className="text-sm text-marrom-escuro/60">{descricao}</p>
@@ -96,6 +112,15 @@ export default function ConteudoSecaoForm({ chave, titulo, descricao, campos, va
           {pendente ? 'Salvando...' : 'Salvar'}
         </button>
       </div>
+      </div>
+
+      <aside className="flex flex-col gap-2 min-w-0" aria-label={`Prévia: ${titulo}`}>
+        <span className="text-xs uppercase tracking-[0.14em] text-marrom-escuro/50">Prévia no site</span>
+        <div className="rounded-xl overflow-hidden border border-marrom-escuro/10 shadow-sm">
+          <PreviaConteudo chave={chave} valores={vivos} />
+        </div>
+        <span className="text-xs text-marrom-escuro/50">Atualiza enquanto você digita. Só vai para o site ao salvar.</span>
+      </aside>
     </form>
   )
 }

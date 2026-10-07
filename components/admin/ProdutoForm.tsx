@@ -55,7 +55,6 @@ export default function ProdutoForm({ produtoExistente }: Props) {
   const [disponivel, setDisponivel] = useState(
     produtoExistente?.disponivel ?? true,
   );
-  const [ordem, setOrdem] = useState(String(produtoExistente?.ordem ?? 0));
   const [destaque, setDestaque] = useState(produtoExistente?.destaque ?? false);
 
   const [erro, setErro] = useState("");
@@ -95,7 +94,6 @@ export default function ProdutoForm({ produtoExistente }: Props) {
     dados.set("ingredientes", ingredientes);
     dados.set("descricao", descricao);
     dados.set("disponivel", disponivel ? "sim" : "nao");
-    dados.set("ordem", ordem.trim() || "0");
     dados.set("destaque", destaque ? "sim" : "nao");
 
     for (const foto of fotos) {
@@ -233,31 +231,8 @@ export default function ProdutoForm({ produtoExistente }: Props) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="ordem" className="text-xs text-marrom-escuro">
-                Ordem no catálogo
-              </label>
-              <input
-                id="ordem"
-                type="number"
-                inputMode="numeric"
-                step={1}
-                value={ordem}
-                onChange={(e) => setOrdem(e.target.value)}
-                aria-invalid={!!camposComErro.ordem}
-                aria-describedby="ordem-ajuda"
-                className="bg-branco rounded-xl shadow-sm px-4 py-3 text-preto outline-none"
-              />
-              <span id="ordem-ajuda" className="text-xs text-marrom-escuro/60">
-                Menor aparece primeiro.
-              </span>
-              {camposComErro.ordem && (
-                <span className="text-xs text-red-600">{camposComErro.ordem}</span>
-              )}
-            </div>
-
-            <label className="flex items-center gap-3 self-start mt-6 bg-branco rounded-xl shadow-sm px-4 py-3 cursor-pointer text-sm text-marrom-escuro">
+          <div className="flex flex-col gap-1.5">
+            <label className="flex items-center gap-3 self-start bg-branco rounded-xl shadow-sm px-4 py-3 cursor-pointer text-sm text-marrom-escuro">
               <input
                 type="checkbox"
                 checked={destaque}
@@ -266,12 +241,48 @@ export default function ProdutoForm({ produtoExistente }: Props) {
               />
               Destaque na vitrine
             </label>
+            <span className="text-xs text-marrom-escuro/60">
+              A posição no catálogo é ajustada em Produtos → Organizar ordem.
+            </span>
           </div>
         </div>
 
         {/* Coluna direita */}
-        <div>
+        <div className="flex flex-col gap-6">
           <UploadFotos fotos={fotos} onChange={setFotos} />
+
+          {/* Como o card vai aparecer no catálogo, atualizado enquanto se edita. */}
+          <div className="flex flex-col gap-2">
+            <span className="text-xs text-marrom-escuro">Prévia no catálogo</span>
+            <div className="flex items-start gap-4">
+              <div className="w-44 flex flex-col gap-2">
+                <div className="relative w-full aspect-4/5 rounded-2xl overflow-hidden bg-branco shadow-sm">
+                  {fotos[0] ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- prévia local (blob:) não passa pelo otimizador
+                    <img src={fotos[0].preview} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-cor-pele">
+                      <Icon icon="mdi:image-off-outline" className="text-3xl" />
+                    </div>
+                  )}
+                  {destaque && (
+                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-amarelo px-2 py-0.5 text-[11px] font-medium text-marrom-escuro">
+                      <Icon icon="mdi:star" />
+                      Destaque
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm font-medium text-marrom-escuro leading-snug break-words">
+                  {nome.trim() || "Nome do produto"}
+                </p>
+              </div>
+              <p className="text-xs text-marrom-escuro/60 max-w-[14rem]">
+                {disponivel
+                  ? `Aparece em “${categoria}” no site depois de salvar.`
+                  : "Indisponível: fica só no painel, não aparece no site."}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 

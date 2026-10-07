@@ -287,7 +287,7 @@ export default function UploadFotos({ fotos, onChange }: Props) {
                 type="button"
                 onClick={diminuirEUsar}
                 disabled={diminuindo}
-                className="flex-1 px-6 py-2.5 rounded-xl bg-marrom-escuro hover:bg-marrom text-branco font-medium transition-colors disabled:opacity-60"
+                className="flex-1 whitespace-nowrap px-4 py-2.5 rounded-xl bg-marrom-escuro hover:bg-marrom text-branco font-medium transition-colors disabled:opacity-60"
               >
                 {diminuindo ? 'Diminuindo...' : 'Diminuir e usar'}
               </button>

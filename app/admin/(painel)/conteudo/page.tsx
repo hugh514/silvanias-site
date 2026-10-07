@@ -52,7 +52,7 @@ export default async function ConteudoPage() {
   const conteudo = await carregarConteudo()
 
   return (
-    <div className="max-w-3xl mx-auto flex flex-col gap-6">
+    <div className="max-w-6xl mx-auto flex flex-col gap-6">
       <header>
         <h1 className="font-titulo text-2xl md:text-3xl text-marrom-escuro">Textos do site</h1>
         <p className="text-sm text-marrom-escuro/60">Cada bloco salva separado e aparece no site na hora.</p>
