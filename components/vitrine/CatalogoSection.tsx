@@ -1,6 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { CATEGORIAS, gerarLinkWhatsapp, MENSAGEM_ZAP_GERAL } from '@/lib/constants'
+import NavCategorias from './NavCategorias'
 import ProdutoCardVitrine from './ProdutoCardVitrine'
+
+/** "Derivados do Cacau" → "cat-derivados-do-cacau" */
+const idCategoria = (c: string) =>
+  'cat-' + c.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, '-')
 
 export default async function CatalogoSection() {
   const supabase = await createClient()
@@ -13,6 +18,11 @@ export default async function CatalogoSection() {
     .order('created_at', { ascending: false })
 
   const lista = produtos ?? []
+  const grupos = CATEGORIAS.map((categoria) => ({
+    categoria,
+    id: idCategoria(categoria),
+    produtos: lista.filter((p) => p.categoria === categoria),
+  })).filter((g) => g.produtos.length > 0)
 
   return (
     <section id="catalogo" className="bg-branco px-6 py-16 md:py-24">
@@ -39,13 +49,12 @@ export default async function CatalogoSection() {
             </a>
           </div>
         ) : (
+          <>
+          <NavCategorias categorias={grupos.map((g) => ({ id: g.id, nome: g.categoria, total: g.produtos.length }))} />
           <div className="flex flex-col gap-16">
-            {CATEGORIAS.map((categoria) => {
-              const daCategoria = lista.filter((p) => p.categoria === categoria)
-              if (daCategoria.length === 0) return null
-
+            {grupos.map(({ categoria, id, produtos: daCategoria }) => {
               return (
-                <div key={categoria} className="flex flex-col gap-6">
+                <div key={categoria} id={id} className="flex flex-col gap-6 scroll-mt-36">
                   <div className="flex items-baseline justify-between gap-4 border-b border-marrom-escuro/10 pb-3">
                     <h3 className="font-titulo text-2xl text-marrom-escuro">{categoria}</h3>
                     <span className="text-sm text-marrom-escuro/60">
@@ -53,9 +62,9 @@ export default async function CatalogoSection() {
                     </span>
                   </div>
 
-                  <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                  <ul className="cascata grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                     {daCategoria.map((produto) => (
-                      <li key={produto.id} className="revelar">
+                      <li key={produto.id}>
                         <ProdutoCardVitrine produto={produto} />
                       </li>
                     ))}
@@ -64,6 +73,7 @@ export default async function CatalogoSection() {
               )
             })}
           </div>
+          </>
         )}
       </div>
     </section>

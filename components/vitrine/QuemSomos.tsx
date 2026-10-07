@@ -31,7 +31,7 @@ export default async function QuemSomos() {
           </h2>
           <p className="text-marrom-escuro/80 leading-relaxed md:text-lg whitespace-pre-line">{quem_somos.texto}</p>
 
-          <ul className="grid sm:grid-cols-3 gap-4 pt-2">
+          <ul className="cascata grid sm:grid-cols-3 gap-4 pt-2">
             {VALORES.map((v) => (
               <li key={v.titulo} className="rounded-2xl bg-branco p-4">
                 <p className="font-medium text-marrom-escuro">{v.titulo}</p>

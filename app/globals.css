@@ -95,7 +95,42 @@ button:disabled {
   opacity: 1;
 }
 
+/* Título do hero: cada palavra numa janela que esconde o que está abaixo. */
+.palavra {
+  display: inline-block;
+  overflow: clip;
+  overflow-clip-margin: 0.12em;
+  vertical-align: top;
+  padding-bottom: 0.08em;
+}
+.palavra > span {
+  display: inline-block;
+}
+
 @media (prefers-reduced-motion: no-preference) {
+  .palavra > span {
+    animation: palavra 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(0.15s + var(--i, 0) * 45ms);
+  }
+
+  .aparecer {
+    animation: aparecer 0.7s ease-out both;
+    animation-delay: var(--atraso, 0s);
+  }
+
+  /* Itens de grelha: cada coluna entra um pouco depois da anterior. */
+  @supports (animation-timeline: view()) {
+    .cascata > * {
+      --col: 0;
+      animation: revelar linear both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--col) * 8%) entry calc(35% + var(--col) * 8%);
+    }
+    .cascata > :nth-child(4n + 2) { --col: 1; }
+    .cascata > :nth-child(4n + 3) { --col: 2; }
+    .cascata > :nth-child(4n + 4) { --col: 3; }
+  }
+
   /* Um momento só: as camadas do hero entram em sequência ao abrir a página. */
   .entrar {
     animation: entrar 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -124,6 +159,19 @@ button:disabled {
   from {
     opacity: 0;
     transform: translateY(28px) scale(0.96);
+  }
+}
+
+@keyframes palavra {
+  from {
+    transform: translateY(105%);
+  }
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
   }
 }
 

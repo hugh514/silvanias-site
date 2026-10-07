@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import Image from 'next/image'
 import { Icone as Icon } from '@/components/ui/Icone'
 import Profundidade from './Profundidade'
@@ -18,19 +19,29 @@ export default async function Hero() {
     <section className="bg-branco-falso overflow-x-clip px-6 pt-10 pb-16 md:pt-16 md:pb-24">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 items-center gap-10 md:gap-16">
         <div className="flex flex-col gap-6">
-          <span className="text-xs font-medium uppercase tracking-[0.18em] text-cor-pele">
+          <span className="aparecer text-xs font-medium uppercase tracking-[0.18em] text-cor-pele" style={{ '--atraso': '0.05s' } as React.CSSProperties}>
             Agroindústria de cacau · Amazônia
           </span>
 
           <h1 className="font-titulo text-4xl sm:text-5xl lg:text-6xl font-medium text-marrom-escuro leading-[1.05]">
-            {hero.titulo}
+            {/* Cada palavra sobe de dentro da sua própria janela. O texto
+                continua inteiro no HTML para leitores de tela e busca. */}
+            {/* O espaço fica FORA da janela: dentro de um inline-block ele some. */}
+            {hero.titulo.split(/\s+/).map((palavra, i) => (
+              <Fragment key={i}>
+                {i > 0 && ' '}
+                <span className="palavra">
+                  <span style={{ '--i': i } as React.CSSProperties}>{palavra}</span>
+                </span>
+              </Fragment>
+            ))}
           </h1>
 
-          <p className="text-marrom-escuro/80 text-base md:text-lg max-w-md leading-relaxed">
+          <p className="aparecer text-marrom-escuro/80 text-base md:text-lg max-w-md leading-relaxed" style={{ '--atraso': '0.55s' } as React.CSSProperties}>
             {hero.descricao}
           </p>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="aparecer flex flex-wrap gap-3" style={{ '--atraso': '0.7s' } as React.CSSProperties}>
             <a
               href="#catalogo"
               className="bg-marrom-escuro hover:bg-marrom text-branco font-medium px-7 py-3.5 rounded-full transition-colors"
@@ -48,7 +59,7 @@ export default async function Hero() {
             </a>
           </div>
 
-          <ul className="flex flex-wrap gap-x-6 gap-y-2 pt-2 text-sm text-marrom-escuro/80">
+          <ul className="aparecer flex flex-wrap gap-x-6 gap-y-2 pt-2 text-sm text-marrom-escuro/80" style={{ '--atraso': '0.85s' } as React.CSSProperties}>
             {DIFERENCIAIS.map((d) => (
               <li key={d.texto} className="flex items-center gap-2">
                 <Icon icon={d.icone} className="text-cor-pele text-lg" />
