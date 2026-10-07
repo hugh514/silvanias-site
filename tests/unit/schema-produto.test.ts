@@ -171,9 +171,10 @@ describe('validarFormularioProduto', () => {
     expect(r.ok).toBe(false)
   })
 
-  it('usa_ordem_zero_e_sem_destaque_quando_omitidos', () => {
+  it('nao_define_ordem_quando_o_formulario_nao_envia', () => {
+    // A ordem é ajustada na lista; editar o produto não pode zerá-la.
     const r = validarFormularioProduto(formulario(VALIDO))
-    expect(r.ok && { ordem: r.dados.ordem, destaque: r.dados.destaque }).toEqual({ ordem: 0, destaque: false })
+    expect(r.ok && { ordem: r.dados.ordem, destaque: r.dados.destaque }).toEqual({ ordem: undefined, destaque: false })
   })
 
   it('le_ordem_e_destaque_do_formulario', () => {

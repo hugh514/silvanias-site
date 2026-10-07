@@ -34,8 +34,16 @@ import openInNew from '@iconify-icons/mdi/open-in-new'
 import pencilOutline from '@iconify-icons/mdi/pencil-outline'
 import checkCircleOutline from '@iconify-icons/mdi/check-circle-outline'
 import alertCircleOutline from '@iconify-icons/mdi/alert-circle-outline'
+import dragIcone from '@iconify-icons/mdi/drag'
+import arrowUpIcone from '@iconify-icons/mdi/arrow-up'
+import arrowDownIcone from '@iconify-icons/mdi/arrow-down'
+import sortIcone from '@iconify-icons/mdi/sort'
 
 export const ICONES = {
+  'mdi:drag': dragIcone,
+  'mdi:arrow-up': arrowUpIcone,
+  'mdi:arrow-down': arrowDownIcone,
+  'mdi:sort': sortIcone,
   'mdi:package-variant': packageVariant,
   'mdi:text-box-edit-outline': textBoxEditOutline,
   'mdi:open-in-new': openInNew,

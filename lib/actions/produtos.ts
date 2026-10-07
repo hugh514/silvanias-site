@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
 
 import { validarFormularioProduto, MAX_FOTOS, type CamposComErro } from '@/lib/schemas/produto'
 import { createClient, verificarAdmin } from '@/lib/supabase/server'
@@ -143,7 +144,7 @@ export async function criarProduto(
     descricao: dados.descricao,
     ingredientes: dados.ingredientes,
     disponivel: dados.disponivel,
-    ordem: dados.ordem,
+    ordem: dados.ordem ?? 0,
     destaque: dados.destaque,
     fotos: envio.urls,
   })
@@ -217,8 +218,8 @@ export async function atualizarProduto(
       descricao: dados.descricao,
       ingredientes: dados.ingredientes,
       disponivel: dados.disponivel,
-    ordem: dados.ordem,
-    destaque: dados.destaque,
+      ...(dados.ordem !== undefined && { ordem: dados.ordem }),
+      destaque: dados.destaque,
       fotos: fotosFinais,
     })
     .eq('id', id)
@@ -280,5 +281,39 @@ export async function removerProduto(id: string): Promise<ResultadoAcao> {
   }
 
   revalidarTudo(id)
+  return { ok: true }
+}
+
+// -----------------------------------------------------------------------------
+// Reordenar
+// -----------------------------------------------------------------------------
+
+const listaDeIds = z
+  .array(z.string().uuid())
+  .min(1)
+  .max(500)
+  .refine((ids) => new Set(ids).size === ids.length, 'Lista com produtos repetidos.')
+
+/**
+ * Grava a ordem vinda de "Organizar ordem": a posição na lista vira `ordem`
+ * (de 10 em 10, para um produto novo com ordem 0 aparecer primeiro).
+ */
+export async function reordenarProdutos(ids: string[]): Promise<ResultadoAcao> {
+  const negado = await exigirAdmin()
+  if (negado) return negado
+
+  const validacao = listaDeIds.safeParse(ids)
+  if (!validacao.success) return { ok: false, erro: ERRO_GENERICO }
+
+  const supabase = await createClient()
+  for (const [i, id] of validacao.data.entries()) {
+    const { error } = await supabase.from('produtos').update({ ordem: (i + 1) * 10 }).eq('id', id)
+    if (error) {
+      console.error('[reordenarProdutos]', error)
+      return { ok: false, erro: ERRO_GENERICO }
+    }
+  }
+
+  revalidarTudo()
   return { ok: true }
 }

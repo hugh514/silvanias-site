@@ -4,6 +4,7 @@ const MENSAGENS = {
   criado: 'Produto cadastrado.',
   salvo: 'Alterações salvas.',
   excluido: 'Produto excluído.',
+  ordem: 'Nova ordem salva. O site já mostra os produtos nessa sequência.',
 } as const
 
 export type TipoAviso = keyof typeof MENSAGENS

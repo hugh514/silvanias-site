@@ -48,7 +48,8 @@ export const produtoSchema = z.object({
     .int('A ordem deve ser um número inteiro.')
     .min(-9999, 'A ordem deve estar entre -9999 e 9999.')
     .max(9999, 'A ordem deve estar entre -9999 e 9999.')
-    .default(0),
+    // Opcional: o formulário não envia; a ordem muda em "Organizar ordem".
+    .optional(),
 
   destaque: z.boolean().default(false),
 
@@ -79,7 +80,7 @@ export function validarFormularioProduto(
     descricao: String(formData.get('descricao') ?? ''),
     ingredientes: String(formData.get('ingredientes') ?? ''),
     disponivel: formData.get('disponivel') === 'sim',
-    ordem: Number(String(formData.get('ordem') ?? '').trim() || '0'),
+    ordem: formData.has('ordem') ? Number(String(formData.get('ordem')).trim() || '0') : undefined,
     destaque: formData.get('destaque') === 'sim',
     fotosExistentes: formData.getAll('fotosExistentes').map(String),
   }

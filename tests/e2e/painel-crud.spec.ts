@@ -34,7 +34,6 @@ test.describe('painel de administração', () => {
     await page.getByLabel('Nome do produto').fill(nomeProduto)
     await page.getByLabel('Categoria').selectOption({ index: 0 })
     await page.getByLabel('Descrição').fill('Criado por teste automatizado.')
-    await page.getByLabel('Ordem no catálogo').fill('-9999')
     await page.getByLabel('Destaque na vitrine').check()
     await page.getByRole('button', { name: 'Salvar' }).click()
 
@@ -90,6 +89,19 @@ test.describe('painel de administração', () => {
     await faixa.locator('#marquee-mensagem').fill(original)
     await faixa.getByRole('button', { name: 'Salvar' }).click()
     await expect(faixa.getByRole('status')).toBeVisible()
+  })
+
+  test('organizar_ordem_muda_a_sequencia_na_vitrine', async ({ page }) => {
+    await page.getByRole('button', { name: 'Organizar ordem' }).click()
+    const primeiro = page.locator('ol').first().locator('li').first()
+    const nome = (await primeiro.locator('span.truncate').innerText()).split('\n')[0].trim()
+    await page.getByRole('button', { name: `Descer ${nome}` }).click()
+    await page.getByRole('button', { name: 'Salvar ordem' }).click()
+    await expect(page).toHaveURL(/aviso=ordem/)
+
+    await page.goto('/')
+    const cards = page.locator('#catalogo ul').first().locator('a[href^="/produtos/"]')
+    await expect(cards.nth(1)).toContainText(nome)
   })
 
   test('sair_do_painel', async ({ page }) => {

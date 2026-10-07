@@ -16,7 +16,7 @@ export default async function AdminProdutosPage({
   // Mesma ordem da vitrine, para o painel mostrar o que o visitante vê.
   const { data: produtos, error } = await supabase
     .from('produtos')
-    .select('id, nome, categoria, disponivel, fotos, ordem, destaque')
+    .select('id, nome, categoria, disponivel, fotos, destaque')
     .order('ordem', { ascending: true })
     .order('created_at', { ascending: false })
 

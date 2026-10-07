@@ -77,7 +77,7 @@ vi.mock('next/cache', () => ({
   revalidatePath: (...args: unknown[]) => revalidatePath(...args),
 }))
 
-const { atualizarProduto, criarProduto, removerProduto } = await import(
+const { atualizarProduto, criarProduto, removerProduto, reordenarProdutos } = await import(
   '@/lib/actions/produtos'
 )
 
@@ -228,5 +228,39 @@ describe('mensagens de erro não expõem detalhes internos (FR-029)', () => {
         }
       }
     }
+  })
+})
+
+describe('reordenarProdutos', () => {
+  const UUID_A = '11111111-1111-4111-8111-111111111111'
+  const UUID_B = '22222222-2222-4222-8222-222222222222'
+
+  it('recusa_quem_nao_e_admin_sem_escrever', async () => {
+    verificarAdmin.mockResolvedValue({ autorizado: false, motivo: 'nao-admin' })
+    const r = await reordenarProdutos([UUID_A, UUID_B])
+    expect(r.ok).toBe(false)
+    expect(escritas).toEqual([])
+  })
+
+  it('recusa_lista_com_id_invalido_sem_escrever', async () => {
+    verificarAdmin.mockResolvedValue({ autorizado: true, userId: 'a' })
+    const r = await reordenarProdutos([UUID_A, "1; drop table produtos"])
+    expect(r.ok).toBe(false)
+    expect(escritas).toEqual([])
+  })
+
+  it('recusa_ids_repetidos_sem_escrever', async () => {
+    verificarAdmin.mockResolvedValue({ autorizado: true, userId: 'a' })
+    const r = await reordenarProdutos([UUID_A, UUID_A])
+    expect(r.ok).toBe(false)
+    expect(escritas).toEqual([])
+  })
+
+  it('grava_uma_posicao_por_produto_e_revalida', async () => {
+    verificarAdmin.mockResolvedValue({ autorizado: true, userId: 'a' })
+    const r = await reordenarProdutos([UUID_B, UUID_A])
+    expect(r.ok).toBe(true)
+    expect(escritas.filter((e) => e === 'db.update')).toHaveLength(2)
+    expect(revalidatePath).toHaveBeenCalledWith('/')
   })
 })

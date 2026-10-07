@@ -6,8 +6,9 @@ import Link from 'next/link'
 
 import { Icone as Icon } from '@/components/ui/Icone'
 import type { Produto as ProdutoCompleto } from '@/types/produto'
+import OrganizarOrdem from './OrganizarOrdem'
 
-type Produto = Pick<ProdutoCompleto, 'id' | 'nome' | 'categoria' | 'disponivel' | 'fotos' | 'ordem' | 'destaque'>
+type Produto = Pick<ProdutoCompleto, 'id' | 'nome' | 'categoria' | 'disponivel' | 'fotos' | 'destaque'>
 type Filtro = 'todos' | 'sim' | 'nao'
 
 const ITENS_POR_PAGINA = 20
@@ -19,6 +20,7 @@ export default function ProdutosTabela({ produtos }: { produtos: Produto[] }) {
   const [busca, setBusca] = useState('')
   const [filtro, setFiltro] = useState<Filtro>('todos')
   const [pagina, setPagina] = useState(1)
+  const [organizando, setOrganizando] = useState(false)
 
   const filtrados = useMemo(() => {
     const termo = normalizar(busca.trim())
@@ -32,6 +34,8 @@ export default function ProdutosTabela({ produtos }: { produtos: Produto[] }) {
   const totalPaginas = Math.max(1, Math.ceil(filtrados.length / ITENS_POR_PAGINA))
   const atual = Math.min(pagina, totalPaginas)
   const daPagina = filtrados.slice((atual - 1) * ITENS_POR_PAGINA, atual * ITENS_POR_PAGINA)
+
+  if (organizando) return <OrganizarOrdem produtos={produtos} aoFechar={() => setOrganizando(false)} />
 
   return (
     <div className="flex flex-col gap-4">
@@ -66,6 +70,15 @@ export default function ProdutosTabela({ produtos }: { produtos: Produto[] }) {
             <option value="nao">Indisponíveis</option>
           </select>
         </label>
+
+        <button
+          type="button"
+          onClick={() => setOrganizando(true)}
+          className="inline-flex items-center justify-center gap-2 bg-branco rounded-xl px-4 h-11 shadow-sm text-sm font-medium text-marrom-escuro hover:bg-branco-falso"
+        >
+          <Icon icon="mdi:sort" className="text-lg" />
+          Organizar ordem
+        </button>
       </div>
 
       <div className="bg-branco rounded-2xl shadow-sm overflow-hidden">
@@ -74,7 +87,6 @@ export default function ProdutosTabela({ produtos }: { produtos: Produto[] }) {
             <tr>
               <th className="px-4 py-3 font-medium">Produto</th>
               <th className="px-4 py-3 font-medium hidden md:table-cell">Categoria</th>
-              <th className="px-4 py-3 font-medium hidden sm:table-cell text-center">Ordem</th>
               <th className="px-4 py-3 font-medium">Situação</th>
               <th className="px-4 py-3">
                 <span className="sr-only">Ações</span>
@@ -101,9 +113,6 @@ export default function ProdutosTabela({ produtos }: { produtos: Produto[] }) {
                   </Link>
                 </td>
                 <td className="px-4 py-3 hidden md:table-cell text-marrom-escuro/80">{p.categoria}</td>
-                <td className="px-4 py-3 hidden sm:table-cell text-center tabular-nums text-marrom-escuro/80">
-                  {p.ordem}
-                </td>
                 <td className="px-4 py-3">
                   <span
                     className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
