@@ -143,6 +143,8 @@ export async function criarProduto(
     descricao: dados.descricao,
     ingredientes: dados.ingredientes,
     disponivel: dados.disponivel,
+    ordem: dados.ordem,
+    destaque: dados.destaque,
     fotos: envio.urls,
   })
 
@@ -215,6 +217,8 @@ export async function atualizarProduto(
       descricao: dados.descricao,
       ingredientes: dados.ingredientes,
       disponivel: dados.disponivel,
+    ordem: dados.ordem,
+    destaque: dados.destaque,
       fotos: fotosFinais,
     })
     .eq('id', id)

@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { Icone as Icon } from '@/components/ui/Icone'
 
+import { carregarConteudo } from '@/lib/conteudo/carregar-conteudo'
 import { gerarLinkWhatsapp, MENSAGEM_ZAP_GERAL } from '@/lib/constants'
 
 const DIFERENCIAIS = [
@@ -9,7 +10,9 @@ const DIFERENCIAIS = [
   { icone: 'mdi:map-marker-path', texto: 'Do cultivo à barra' },
 ] as const
 
-export default function Hero() {
+export default async function Hero() {
+  const { hero } = await carregarConteudo()
+
   return (
     <section className="bg-branco-falso px-6 pt-10 pb-16 md:pt-16 md:pb-24">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 items-center gap-10 md:gap-16">
@@ -19,12 +22,11 @@ export default function Hero() {
           </span>
 
           <h1 className="font-titulo text-4xl sm:text-5xl lg:text-6xl font-medium text-marrom-escuro leading-[1.05]">
-            Chocolates artesanais que dão água na boca
+            {hero.titulo}
           </h1>
 
           <p className="text-marrom-escuro/80 text-base md:text-lg max-w-md leading-relaxed">
-            Todos os produtos da Silvania&apos;s Cacau são feitos com cacau próprio, garantindo origem,
-            qualidade e rastreabilidade do cultivo à produção.
+            {hero.descricao}
           </p>
 
           <div className="flex flex-wrap gap-3">

@@ -49,36 +49,60 @@ export type Database = {
         }
         Relationships: []
       }
+      conteudo_site: {
+        Row: {
+          atualizado_em: string
+          chave: string
+          conteudo: Json
+        }
+        Insert: {
+          atualizado_em?: string
+          chave: string
+          conteudo: Json
+        }
+        Update: {
+          atualizado_em?: string
+          chave?: string
+          conteudo?: Json
+        }
+        Relationships: []
+      }
       produtos: {
         Row: {
           categoria: string
           created_at: string | null
           descricao: string | null
+          destaque: boolean
           disponivel: boolean | null
           fotos: string[] | null
           id: string
           ingredientes: string | null
           nome: string
+          ordem: number
         }
         Insert: {
           categoria: string
           created_at?: string | null
           descricao?: string | null
+          destaque?: boolean
           disponivel?: boolean | null
           fotos?: string[] | null
           id?: string
           ingredientes?: string | null
           nome: string
+          ordem?: number
         }
         Update: {
           categoria?: string
           created_at?: string | null
           descricao?: string | null
+          destaque?: boolean
           disponivel?: boolean | null
           fotos?: string[] | null
           id?: string
           ingredientes?: string | null
           nome?: string
+          ordem?: number
         }
         Relationships: []
       }

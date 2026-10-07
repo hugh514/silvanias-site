@@ -1,12 +1,16 @@
 import Image from 'next/image'
 
+import { carregarConteudo } from '@/lib/conteudo/carregar-conteudo'
+
 const VALORES = [
   { titulo: 'Origem', texto: 'Cacau cultivado por nós, na Amazônia.' },
   { titulo: 'Respeito ao fruto', texto: 'Produção que valoriza a biodiversidade.' },
   { titulo: 'Chocolate de verdade', texto: 'Intenso, cremoso e cheio de história.' },
 ]
 
-export default function QuemSomos() {
+export default async function QuemSomos() {
+  const { quem_somos } = await carregarConteudo()
+
   return (
     <section id="quem-somos" className="bg-branco-falso px-6 py-16 md:py-24">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 md:gap-16 items-center">
@@ -23,12 +27,9 @@ export default function QuemSomos() {
         <div className="flex flex-col gap-6">
           <span className="text-xs font-medium uppercase tracking-[0.18em] text-cor-pele">Quem somos</span>
           <h2 className="font-titulo text-3xl md:text-5xl font-medium text-marrom-escuro leading-tight">
-            Aqui na Amazônia o cacau encontra seu lar
+            {quem_somos.titulo}
           </h2>
-          <p className="text-marrom-escuro/80 leading-relaxed md:text-lg">
-            Somos uma agroindústria de cacau. Cultivamos o fruto que dá vida aos nossos produtos, e a Silvania&apos;s
-            Cacau nasce desse encontro entre o cultivo e a arte de transformar.
-          </p>
+          <p className="text-marrom-escuro/80 leading-relaxed md:text-lg whitespace-pre-line">{quem_somos.texto}</p>
 
           <ul className="grid sm:grid-cols-3 gap-4 pt-2">
             {VALORES.map((v) => (

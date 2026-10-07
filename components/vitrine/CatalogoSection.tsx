@@ -7,8 +7,9 @@ export default async function CatalogoSection() {
 
   const { data: produtos } = await supabase
     .from('produtos')
-    .select('id, nome, categoria, fotos')
+    .select('id, nome, categoria, fotos, destaque')
     .eq('disponivel', true)
+    .order('ordem', { ascending: true })
     .order('created_at', { ascending: false })
 
   const lista = produtos ?? []

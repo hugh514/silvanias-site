@@ -1,9 +1,10 @@
 import { Icone as Icon } from '@/components/ui/Icone'
 
-import { ENDERECO } from '@/lib/constants'
+import { carregarConteudo } from '@/lib/conteudo/carregar-conteudo'
 
-export default function OndeNosEncontrar() {
-  const { latitude, longitude } = ENDERECO
+export default async function OndeNosEncontrar() {
+  const { onde_encontrar } = await carregarConteudo()
+  const { lat: latitude, lng: longitude } = onde_encontrar
   const mapaEmbedUrl = `https://www.google.com/maps?q=${latitude},${longitude}&z=16&output=embed`
   const mapaLinkUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`
 
@@ -16,13 +17,7 @@ export default function OndeNosEncontrar() {
 
           <address className="not-italic flex gap-3 text-marrom-escuro">
             <Icon icon="mdi:map-marker-outline" className="text-2xl shrink-0 text-cor-pele" />
-            <span>
-              {ENDERECO.rua}
-              <br />
-              {ENDERECO.cidade}
-              <br />
-              {ENDERECO.cep}
-            </span>
+            <span className="whitespace-pre-line">{onde_encontrar.endereco}</span>
           </address>
 
           <a

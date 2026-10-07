@@ -158,4 +158,36 @@ describe('validarFormularioProduto', () => {
     )
     expect(r.ok).toBe(false)
   })
+
+  it('aceita_foto_existente_das_imagens_do_site', () => {
+    const r = validarFormularioProduto(
+      formulario({ ...VALIDO, fotosExistentes: ['/images/categoria-chocolate-v3.png'] })
+    )
+    expect(r.ok).toBe(true)
+  })
+
+  it('recusa_caminho_relativo_fora_de_images', () => {
+    const r = validarFormularioProduto(formulario({ ...VALIDO, fotosExistentes: ['/admin/x.png'] }))
+    expect(r.ok).toBe(false)
+  })
+
+  it('usa_ordem_zero_e_sem_destaque_quando_omitidos', () => {
+    const r = validarFormularioProduto(formulario(VALIDO))
+    expect(r.ok && { ordem: r.dados.ordem, destaque: r.dados.destaque }).toEqual({ ordem: 0, destaque: false })
+  })
+
+  it('le_ordem_e_destaque_do_formulario', () => {
+    const r = validarFormularioProduto(formulario({ ...VALIDO, ordem: '3', destaque: 'sim' }))
+    expect(r.ok && { ordem: r.dados.ordem, destaque: r.dados.destaque }).toEqual({ ordem: 3, destaque: true })
+  })
+
+  it('recusa_ordem_que_nao_e_inteiro', () => {
+    const r = validarFormularioProduto(formulario({ ...VALIDO, ordem: '1.5' }))
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.camposComErro.ordem).toBeDefined()
+  })
+
+  it('recusa_ordem_fora_do_intervalo', () => {
+    expect(validarFormularioProduto(formulario({ ...VALIDO, ordem: '100000' })).ok).toBe(false)
+  })
 })

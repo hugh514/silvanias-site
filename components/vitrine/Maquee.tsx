@@ -1,8 +1,9 @@
 import { Icone as Icon } from '@/components/ui/Icone'
 
-const MENSAGEM = 'A arte de transformar paixão em sabor'
+import { carregarConteudo } from '@/lib/conteudo/carregar-conteudo'
 
-export default function Marquee() {
+export default async function Marquee() {
+  const { marquee } = await carregarConteudo()
   // Repete o conteúdo várias vezes para preencher telas largas sem espaço vazio
   const itens = Array.from({ length: 8 })
 
@@ -16,7 +17,7 @@ export default function Marquee() {
               <div key={i} className="flex items-center gap-3 px-6">
                 <Icon icon="mdi:star" className="text-amarelo text-lg shrink-0" />
                 <span className="text-branco text-sm font-medium whitespace-nowrap">
-                  {MENSAGEM}
+                  {marquee.mensagem}
                 </span>
               </div>
             ))}

@@ -42,9 +42,20 @@ export const produtoSchema = z.object({
 
   disponivel: z.boolean(),
 
+  /** Posição no catálogo público: menor aparece primeiro. */
+  ordem: z
+    .number({ message: 'A ordem deve ser um número inteiro.' })
+    .int('A ordem deve ser um número inteiro.')
+    .min(-9999, 'A ordem deve estar entre -9999 e 9999.')
+    .max(9999, 'A ordem deve estar entre -9999 e 9999.')
+    .default(0),
+
+  destaque: z.boolean().default(false),
+
   /** Endereços de fotos já guardadas que devem ser mantidas. */
   fotosExistentes: z
-    .array(z.string().url())
+    // URL do armazenamento, ou uma das imagens estáticas do site (`/images/…`).
+    .array(z.union([z.string().url(), z.string().regex(/^\/images\/[\w.-]+$/)]))
     .max(MAX_FOTOS, `São permitidas no máximo ${MAX_FOTOS} fotos.`)
     .default([]),
 })
@@ -68,6 +79,8 @@ export function validarFormularioProduto(
     descricao: String(formData.get('descricao') ?? ''),
     ingredientes: String(formData.get('ingredientes') ?? ''),
     disponivel: formData.get('disponivel') === 'sim',
+    ordem: Number(String(formData.get('ordem') ?? '').trim() || '0'),
+    destaque: formData.get('destaque') === 'sim',
     fotosExistentes: formData.getAll('fotosExistentes').map(String),
   }
 

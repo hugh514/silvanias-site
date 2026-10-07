@@ -1,14 +1,16 @@
 import Image from 'next/image'
 import { Icone as Icon } from '@/components/ui/Icone'
 
-import { ENDERECO, gerarLinkWhatsapp, INSTAGRAM_URL, MENSAGEM_ZAP_GERAL } from '@/lib/constants'
+import { gerarLinkWhatsapp, MENSAGEM_ZAP_GERAL } from '@/lib/constants'
+import { carregarConteudo } from '@/lib/conteudo/carregar-conteudo'
 
-export default function Rodape() {
+export default async function Rodape() {
+  const { rodape, onde_encontrar } = await carregarConteudo()
   const anoAtual = new Date().getFullYear()
 
   const contatos = [
     { nome: 'WhatsApp', icone: 'mdi:whatsapp', href: gerarLinkWhatsapp(MENSAGEM_ZAP_GERAL) },
-    { nome: 'Instagram', icone: 'mdi:instagram', href: INSTAGRAM_URL },
+    { nome: 'Instagram', icone: 'mdi:instagram', href: rodape.instagram_url },
   ] as const
 
   return (
@@ -22,7 +24,7 @@ export default function Rodape() {
             height={140}
             className="w-28 h-auto rounded-2xl bg-branco-falso p-3"
           />
-          <p className="text-sm text-branco/70 max-w-xs">A arte de transformar paixão em sabor.</p>
+          <p className="text-sm text-branco/70 max-w-xs">{rodape.frase}</p>
         </div>
 
         <div className="flex flex-col gap-3">
@@ -43,12 +45,8 @@ export default function Rodape() {
 
         <div className="flex flex-col gap-3">
           <p className="text-xs uppercase tracking-[0.18em] text-amarelo">Endereço</p>
-          <address className="not-italic text-sm text-branco/85 leading-relaxed">
-            {ENDERECO.rua}
-            <br />
-            {ENDERECO.cidade}
-            <br />
-            {ENDERECO.cep}
+          <address className="not-italic text-sm text-branco/85 leading-relaxed whitespace-pre-line">
+            {onde_encontrar.endereco}
           </address>
         </div>
       </div>

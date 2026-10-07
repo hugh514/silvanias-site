@@ -4,7 +4,7 @@ import { Icone as Icon } from '@/components/ui/Icone'
 
 import type { Produto as ProdutoCompleto } from '@/types/produto'
 
-type Produto = Pick<ProdutoCompleto, 'id' | 'nome' | 'categoria' | 'fotos'>
+type Produto = Pick<ProdutoCompleto, 'id' | 'nome' | 'categoria' | 'fotos'> & { destaque?: boolean }
 
 export default function ProdutoCardVitrine({ produto }: { produto: Produto }) {
   const foto = produto.fotos?.[0]
@@ -24,6 +24,12 @@ export default function ProdutoCardVitrine({ produto }: { produto: Produto }) {
           <div className="w-full h-full flex items-center justify-center text-cor-pele">
             <Icon icon="mdi:image-off-outline" className="text-3xl" aria-label="Sem foto" />
           </div>
+        )}
+        {produto.destaque && (
+          <span className="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-amarelo px-2.5 py-1 text-xs font-medium text-marrom-escuro">
+            <Icon icon="mdi:star" />
+            Destaque
+          </span>
         )}
       </div>
 
