@@ -59,3 +59,77 @@ button:disabled {
     animation: none;
   }
 }
+/* ---------------------------------------------------------------------------
+ * Profundidade (hero), inclinação (cards) e entrada das seções.
+ * Tudo parado com "reduzir movimento".
+ * ------------------------------------------------------------------------- */
+
+/* Cada camada desloca `--prof` px por unidade de --px/--py (ver Profundidade.tsx). */
+.camada {
+  --prof: 0;
+  translate: calc(var(--px, 0) * var(--prof) * 1px) calc(var(--py, 0) * var(--prof) * 1px);
+}
+
+.palco-foto {
+  transform: perspective(1400px) rotateY(calc(var(--px, 0) * -5deg)) rotateX(calc(var(--py, 0) * 4deg));
+}
+
+.inclinavel {
+  --rx: 0deg;
+  --ry: 0deg;
+  position: relative;
+  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 0.25s ease-out;
+}
+.inclinavel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgb(255 255 255 / 0.35), transparent 50%);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.inclinavel:hover::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Um momento só: as camadas do hero entram em sequência ao abrir a página. */
+  .entrar {
+    animation: entrar 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: var(--atraso, 0s);
+  }
+
+  @supports (animation-timeline: view()) {
+    .revelar {
+      animation: revelar linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inclinavel {
+    transform: none;
+  }
+  .inclinavel::after {
+    display: none;
+  }
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.96);
+  }
+}
+
+@keyframes revelar {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}

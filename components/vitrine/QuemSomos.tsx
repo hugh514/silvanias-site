@@ -14,7 +14,7 @@ export default async function QuemSomos() {
   return (
     <section id="quem-somos" className="bg-branco-falso px-6 py-16 md:py-24">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-        <div className="relative aspect-4/5 w-full rounded-3xl overflow-hidden">
+        <div className="revelar relative aspect-4/5 w-full rounded-3xl overflow-hidden">
           <Image
             src="/images/imagem-quem-somos-2-v2.png"
             alt="Pé de cacau carregado de frutos na Amazônia"
@@ -24,7 +24,7 @@ export default async function QuemSomos() {
           />
         </div>
 
-        <div className="flex flex-col gap-6">
+        <div className="revelar flex flex-col gap-6">
           <span className="text-xs font-medium uppercase tracking-[0.18em] text-cor-pele">Quem somos</span>
           <h2 className="font-titulo text-3xl md:text-5xl font-medium text-marrom-escuro leading-tight">
             {quem_somos.titulo}

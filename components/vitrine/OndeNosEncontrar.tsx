@@ -11,7 +11,7 @@ export default async function OndeNosEncontrar() {
   return (
     <section id="onde-estamos" className="bg-branco px-6 py-16 md:py-24">
       <div className="max-w-6xl mx-auto grid md:grid-cols-[2fr_3fr] gap-10 items-stretch">
-        <div className="flex flex-col gap-6 justify-center">
+        <div className="revelar flex flex-col gap-6 justify-center">
           <span className="text-xs font-medium uppercase tracking-[0.18em] text-cor-pele">Onde estamos</span>
           <h2 className="font-titulo text-3xl md:text-5xl font-medium text-marrom-escuro">Venha nos visitar</h2>
 
