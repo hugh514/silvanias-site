@@ -20,11 +20,11 @@ export default function MenuPainel() {
     <aside className="md:w-60 md:min-h-screen md:sticky md:top-0 bg-marrom-escuro text-branco flex md:flex-col gap-2 px-4 py-3 md:py-6 items-center md:items-stretch">
       <Link href="/admin/produtos" className="shrink-0 md:mb-6 md:px-2">
         <Image
-          src="/images/logo.png"
+          src="/images/logo-claro.png"
           alt="Silvania's Cacau"
           width={96}
           height={96}
-          className="h-10 md:h-14 w-auto rounded-xl bg-branco-falso p-1.5"
+          className="h-9 md:h-16 w-auto"
         />
       </Link>
 

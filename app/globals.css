@@ -118,31 +118,85 @@ button:disabled {
     animation-delay: var(--atraso, 0s);
   }
 
-  /* Itens de grelha: cada coluna entra um pouco depois da anterior. */
-  @supports (animation-timeline: view()) {
-    .cascata > * {
-      --col: 0;
-      animation: revelar linear both;
-      animation-timeline: view();
-      animation-range: entry calc(var(--col) * 8%) entry calc(35% + var(--col) * 8%);
-    }
-    .cascata > :nth-child(4n + 2) { --col: 1; }
-    .cascata > :nth-child(4n + 3) { --col: 2; }
-    .cascata > :nth-child(4n + 4) { --col: 3; }
-  }
-
   /* Um momento só: as camadas do hero entram em sequência ao abrir a página. */
   .entrar {
     animation: entrar 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
     animation-delay: var(--atraso, 0s);
   }
 
-  @supports (animation-timeline: view()) {
-    .revelar {
-      animation: revelar linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 35%;
-    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-marquee {
+    animation: none;
+  }
+}
+/* ---------------------------------------------------------------------------
+ * Profundidade (hero), inclinação (cards) e entrada das seções.
+ * Tudo parado com "reduzir movimento".
+ * ------------------------------------------------------------------------- */
+
+/* Cada camada desloca `--prof` px por unidade de --px/--py (ver Profundidade.tsx). */
+.camada {
+  --prof: 0;
+  translate: calc(var(--px, 0) * var(--prof) * 1px) calc(var(--py, 0) * var(--prof) * 1px);
+}
+
+.palco-foto {
+  transform: perspective(1400px) rotateY(calc(var(--px, 0) * -5deg)) rotateX(calc(var(--py, 0) * 4deg));
+}
+
+.inclinavel {
+  --rx: 0deg;
+  --ry: 0deg;
+  position: relative;
+  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 0.25s ease-out;
+}
+.inclinavel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgb(255 255 255 / 0.35), transparent 50%);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.inclinavel:hover::after {
+  opacity: 1;
+}
+
+/* Título do hero: cada palavra numa janela que esconde o que está abaixo. */
+.palavra {
+  display: inline-block;
+  overflow: clip;
+  overflow-clip-margin: 0.12em;
+  vertical-align: top;
+  padding-bottom: 0.08em;
+}
+.palavra > span {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .palavra > span {
+    animation: palavra 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(0.15s + var(--i, 0) * 45ms);
+  }
+
+  .aparecer {
+    animation: aparecer 0.7s ease-out both;
+    animation-delay: var(--atraso, 0s);
+  }
+
+  /* Um momento só: as camadas do hero entram em sequência ao abrir a página. */
+  .entrar {
+    animation: entrar 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: var(--atraso, 0s);
   }
 }
 
@@ -175,9 +229,71 @@ button:disabled {
   }
 }
 
-@keyframes revelar {
+
+/* Entrada ao rolar (ver Revelador.tsx). Só esconde com a classe no <html>. */
+.js-revelar [data-revelar] {
+  transition:
+    opacity 0.7s ease-out,
+    transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: calc(var(--i, 0) * 90ms);
+}
+.js-revelar [data-revelar]:not(.visivel) {
+  opacity: 0;
+  transform: translateY(36px) scale(0.98);
+}
+
+/* Menu do site: alto no topo da página, compacto depois de rolar. */
+.cabecalho {
+  height: 5rem;
+  transition: height 0.3s ease;
+}
+.cabecalho-logo {
+  height: 3.6rem;
+  transition: height 0.3s ease;
+}
+html[data-rolado] .cabecalho {
+  height: 4rem;
+}
+html[data-rolado] .cabecalho-logo {
+  height: 2.9rem;
+}
+
+/* Páginas de aviso (404 / erro): um movimento curto, uma vez. */
+@media (prefers-reduced-motion: no-preference) {
+  .grao {
+    transform-origin: 50% 90%;
+    animation: grao-cai 1s cubic-bezier(0.3, 1.4, 0.5, 1) 0.15s both;
+  }
+  .pedaco-esq {
+    animation: parte-esq 0.9s cubic-bezier(0.3, 1.3, 0.5, 1) 0.2s both;
+  }
+  .pedaco-dir {
+    animation: parte-dir 0.9s cubic-bezier(0.3, 1.3, 0.5, 1) 0.2s both;
+  }
+  .farelo {
+    animation: aparecer 0.4s ease-out 0.7s both;
+  }
+}
+
+@keyframes grao-cai {
   from {
+    transform: translateY(-60%) rotate(-25deg);
     opacity: 0;
-    transform: translateY(24px);
+  }
+}
+@keyframes parte-esq {
+  from {
+    transform: translateX(6px);
+  }
+  to {
+    transform: translateX(-4px) rotate(-3deg);
+  }
+}
+@keyframes parte-dir {
+  from {
+    transform: translateX(-6px);
+  }
+  to {
+    transform: translateX(4px) rotate(4deg);
   }
 }

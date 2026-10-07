@@ -18,11 +18,11 @@ export default async function Rodape() {
       <div className="max-w-6xl mx-auto grid gap-10 md:grid-cols-3">
         <div className="flex flex-col gap-4">
           <Image
-            src="/images/logo.png"
+            src="/images/logo-claro.png"
             alt="Silvania's Cacau"
             width={140}
             height={140}
-            className="w-28 h-auto rounded-2xl bg-branco-falso p-3"
+            className="w-32 h-auto"
           />
           <p className="text-sm text-branco/70 max-w-xs">{rodape.frase}</p>
         </div>

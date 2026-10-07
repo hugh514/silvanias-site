@@ -4,6 +4,7 @@ import Hero from '@/components/vitrine/Hero'
 import Marquee from '@/components/vitrine/Maquee'
 import OndeNosEncontrar from '@/components/vitrine/OndeNosEncontrar'
 import QuemSomos from '@/components/vitrine/QuemSomos'
+import Revelador from '@/components/vitrine/Revelador'
 import Rodape from '@/components/vitrine/Rodape'
 
 export default function VitrinePage() {
@@ -18,6 +19,7 @@ export default function VitrinePage() {
         <OndeNosEncontrar />
       </main>
       <Rodape />
+      <Revelador />
     </>
   )
 }

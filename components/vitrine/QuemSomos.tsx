@@ -14,7 +14,7 @@ export default async function QuemSomos() {
   return (
     <section id="quem-somos" className="bg-branco-falso px-6 py-16 md:py-24">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-        <div className="revelar relative aspect-4/5 w-full rounded-3xl overflow-hidden">
+        <div data-revelar className="relative aspect-4/5 w-full rounded-3xl overflow-hidden">
           <Image
             src="/images/imagem-quem-somos-2-v2.png"
             alt="Pé de cacau carregado de frutos na Amazônia"
@@ -24,16 +24,16 @@ export default async function QuemSomos() {
           />
         </div>
 
-        <div className="revelar flex flex-col gap-6">
+        <div data-revelar className="flex flex-col gap-6">
           <span className="text-xs font-medium uppercase tracking-[0.18em] text-cor-pele">Quem somos</span>
           <h2 className="font-titulo text-3xl md:text-5xl font-medium text-marrom-escuro leading-tight">
             {quem_somos.titulo}
           </h2>
           <p className="text-marrom-escuro/80 leading-relaxed md:text-lg whitespace-pre-line">{quem_somos.texto}</p>
 
-          <ul className="cascata grid sm:grid-cols-3 gap-4 pt-2">
+          <ul className="grid sm:grid-cols-3 gap-4 pt-2">
             {VALORES.map((v) => (
-              <li key={v.titulo} className="rounded-2xl bg-branco p-4">
+              <li key={v.titulo} data-revelar className="rounded-2xl bg-branco p-4">
                 <p className="font-medium text-marrom-escuro">{v.titulo}</p>
                 <p className="text-sm text-marrom-escuro/70 mt-1">{v.texto}</p>
               </li>

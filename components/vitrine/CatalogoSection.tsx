@@ -27,7 +27,7 @@ export default async function CatalogoSection() {
   return (
     <section id="catalogo" className="bg-branco px-6 py-16 md:py-24">
       <div className="max-w-6xl mx-auto">
-        <div className="revelar flex flex-col gap-3 mb-12 max-w-2xl">
+        <div data-revelar className="flex flex-col gap-3 mb-12 max-w-2xl">
           <span className="text-xs font-medium uppercase tracking-[0.18em] text-cor-pele">Nossos produtos</span>
           <h2 className="font-titulo text-3xl md:text-5xl font-medium text-marrom-escuro">Catálogo</h2>
           <p className="text-marrom-escuro/75">
@@ -55,16 +55,16 @@ export default async function CatalogoSection() {
             {grupos.map(({ categoria, id, produtos: daCategoria }) => {
               return (
                 <div key={categoria} id={id} className="flex flex-col gap-6 scroll-mt-36">
-                  <div className="flex items-baseline justify-between gap-4 border-b border-marrom-escuro/10 pb-3">
+                  <div data-revelar className="flex items-baseline justify-between gap-4 border-b border-marrom-escuro/10 pb-3">
                     <h3 className="font-titulo text-2xl text-marrom-escuro">{categoria}</h3>
                     <span className="text-sm text-marrom-escuro/60">
                       {daCategoria.length} {daCategoria.length === 1 ? 'produto' : 'produtos'}
                     </span>
                   </div>
 
-                  <ul className="cascata grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                  <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                     {daCategoria.map((produto) => (
-                      <li key={produto.id}>
+                      <li key={produto.id} data-revelar>
                         <ProdutoCardVitrine produto={produto} />
                       </li>
                     ))}
