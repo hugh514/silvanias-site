@@ -1,10 +1,11 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Icone as Icon } from '@/components/ui/Icone'
 import Image from 'next/image'
 
 import { MAX_FOTOS } from '@/lib/schemas/produto'
+import { comprimirImagem } from '@/lib/upload/comprimir-imagem'
 import { TAMANHO_MAXIMO_BYTES, TIPOS_PERMITIDOS } from '@/lib/upload/validar-imagem'
 
 export type FotoItem = {
@@ -20,6 +21,8 @@ type Props = {
 }
 
 const MAX_TAMANHO_MB = TAMANHO_MAXIMO_BYTES / 1024 / 1024
+const formatarMB = (bytes: number) =>
+  new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 }).format(bytes / 1024 / 1024)
 
 export default function UploadFotos({ fotos, onChange }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -29,6 +32,55 @@ export default function UploadFotos({ fotos, onChange }: Props) {
   // erro deste componente. Princípio V da constituição.
   const [avisos, setAvisos] = useState<string[]>([])
 
+  // Fotos acima do limite à espera da decisão da dona no modal.
+  const [grandes, setGrandes] = useState<File[]>([])
+  const [diminuindo, setDiminuindo] = useState(false)
+  const [erroModal, setErroModal] = useState('')
+  const botaoPrincipalRef = useRef<HTMLButtonElement>(null)
+  const modalAberto = grandes.length > 0
+
+  function fecharModal() {
+    if (diminuindo) return
+    setGrandes([])
+    setErroModal('')
+  }
+
+  useEffect(() => {
+    if (!modalAberto) return
+    botaoPrincipalRef.current?.focus()
+    function aoTeclar(e: KeyboardEvent) {
+      if (e.key === 'Escape' && !diminuindo) {
+        setGrandes([])
+        setErroModal('')
+      }
+    }
+    document.addEventListener('keydown', aoTeclar)
+    return () => document.removeEventListener('keydown', aoTeclar)
+  }, [modalAberto, diminuindo])
+
+  async function diminuirEUsar() {
+    setDiminuindo(true)
+    setErroModal('')
+    try {
+      const reduzidas = await Promise.all(
+        grandes.map((g) => comprimirImagem(g, TAMANHO_MAXIMO_BYTES))
+      )
+      onChange([
+        ...fotos,
+        ...reduzidas.map((arquivo) => ({
+          id: crypto.randomUUID(),
+          preview: URL.createObjectURL(arquivo),
+          arquivo,
+        })),
+      ])
+      setGrandes([])
+    } catch (e) {
+      setErroModal(e instanceof Error ? e.message : 'Não foi possível diminuir a foto.')
+    } finally {
+      setDiminuindo(false)
+    }
+  }
+
   function handleArquivos(arquivos: FileList | null) {
     if (!arquivos) return
 
@@ -36,6 +88,7 @@ export default function UploadFotos({ fotos, onChange }: Props) {
     const novosAvisos: string[] = []
     const espacoDisponivel = MAX_FOTOS - fotos.length
     const selecionados = Array.from(arquivos)
+    const acimaDoLimite: File[] = []
 
     if (selecionados.length > espacoDisponivel) {
       novosAvisos.push(
@@ -44,15 +97,15 @@ export default function UploadFotos({ fotos, onChange }: Props) {
     }
 
     for (const arquivo of selecionados.slice(0, espacoDisponivel)) {
-      if (arquivo.size > TAMANHO_MAXIMO_BYTES) {
-        novosAvisos.push(`"${arquivo.name}" excede ${MAX_TAMANHO_MB} MB e foi ignorado.`)
-        continue
-      }
-
       // Verificação por conveniência: o servidor revalida pelos bytes reais do
       // ficheiro, porque o tipo declarado aqui é escolhido por quem envia.
       if (!TIPOS_PERMITIDOS.includes(arquivo.type as (typeof TIPOS_PERMITIDOS)[number])) {
         novosAvisos.push(`"${arquivo.name}" não é JPG, PNG, WebP ou AVIF e foi ignorado.`)
+        continue
+      }
+
+      if (arquivo.size > TAMANHO_MAXIMO_BYTES) {
+        acimaDoLimite.push(arquivo)
         continue
       }
 
@@ -65,6 +118,10 @@ export default function UploadFotos({ fotos, onChange }: Props) {
 
     setAvisos(novosAvisos)
     if (novasFotos.length > 0) onChange([...fotos, ...novasFotos])
+    if (acimaDoLimite.length > 0) {
+      setErroModal('')
+      setGrandes(acimaDoLimite)
+    }
 
     // Permite reselecionar o mesmo ficheiro depois de o remover.
     if (inputRef.current) inputRef.current.value = ''
@@ -184,6 +241,57 @@ export default function UploadFotos({ fotos, onChange }: Props) {
               className="object-contain"
               unoptimized={!fotoAmpliada.urlExistente}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Modal de foto acima do limite */}
+      {modalAberto && (
+        <div
+          className="fixed inset-0 bg-preto/60 flex items-center justify-center z-50 p-6"
+          onClick={fecharModal}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="titulo-foto-grande"
+            className="bg-branco rounded-2xl shadow-xl p-8 max-w-sm w-full flex flex-col items-center text-center gap-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p id="titulo-foto-grande" className="text-preto font-medium">
+              Foto muito grande
+            </p>
+            <p className="text-sm text-preto/50">
+              {grandes.length === 1
+                ? `A foto ${grandes[0].name} tem ${formatarMB(grandes[0].size)} MB. O limite é ${MAX_TAMANHO_MB} MB.`
+                : `${grandes.length} fotos passam do limite de ${MAX_TAMANHO_MB} MB.`}
+            </p>
+            <p className="text-sm text-preto/50">Podemos diminuir automaticamente para você.</p>
+            {erroModal && (
+              <p className="text-xs text-red-600" role="alert">
+                {erroModal}
+              </p>
+            )}
+
+            <div className="flex gap-4 mt-6 w-full">
+              <button
+                type="button"
+                onClick={fecharModal}
+                disabled={diminuindo}
+                className="flex-1 px-6 py-2.5 rounded-xl bg-branco-falso text-marrom-escuro font-medium disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+              <button
+                ref={botaoPrincipalRef}
+                type="button"
+                onClick={diminuirEUsar}
+                disabled={diminuindo}
+                className="flex-1 px-6 py-2.5 rounded-xl bg-marrom-escuro hover:bg-marrom text-branco font-medium transition-colors disabled:opacity-60"
+              >
+                {diminuindo ? 'Diminuindo...' : 'Diminuir e usar'}
+              </button>
+            </div>
           </div>
         </div>
       )}
